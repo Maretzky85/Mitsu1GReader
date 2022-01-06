@@ -8,41 +8,42 @@ struct request
     String unit;
 };
 
-#define SWITCHES 2
-#define BATT_VOLTAGE 20
-#define ACC_ENRICH 29
-#define COOLANT_TEMP 7
-#define ENGINE_SPEED 33
-#define FUEL_TRIM_LOW 12
-#define FUEL_TRIM_MID 13
-#define FUEL_TRIM_HIGH 14
-#define INJECTOR_PULSE 41
-#define OXYGEN_FEEDBACK_TRIM 14
-#define OXYGEN_SENSOR 19
-#define TPS 23
-#define AIR_FLOW_HZ 26
-#define AIR_TEMP 58
-#define AIR_VOLUME 44
-#define BARO_SENSOR 21
-#define ISC_STEPS 22
-#define KNOCK_SUM 38
-#define TIMING_ADVANCE 6
-#define EGR_TEMP 18
+const int SWITCHES PROGMEM = 2;
+const int BATT_VOLTAGE PROGMEM = 20;
+const int ACC_ENRICH PROGMEM = 29;
+const int COOLANT_TEMP PROGMEM = 7;
+const int ENGINE_SPEED PROGMEM = 33;
+const int FUEL_TRIM_LOW PROGMEM = 12;
+const int FUEL_TRIM_MID PROGMEM = 13;
+const int FUEL_TRIM_HIGH PROGMEM = 14;
+const int INJECTOR_PULSE PROGMEM = 41;
+const int OXYGEN_FEEDBACK_TRIM PROGMEM = 14;
+const int OXYGEN_SENSOR PROGMEM = 19;
+const int TPS PROGMEM = 23;
+const int AIR_FLOW_HZ PROGMEM = 26;
+const int AIR_TEMP PROGMEM = 58;
+const int AIR_VOLUME PROGMEM = 44;
+const int BARO_SENSOR PROGMEM = 21;
+const int ISC_STEPS PROGMEM = 22;
+const int KNOCK_SUM PROGMEM = 38;
+const int TIMING_ADVANCE PROGMEM = 6;
+const int EGR_TEMP PROGMEM = 18;
 
-#define REQUESTS_SIZE 20
+const int REQUESTS_SIZE PROGMEM = 20;
 
 #define RAW 0
 #define P_12V 1
 #define MIDDLE100 2
 #define ZERO_ONE 3
 #define P_5V 4
+#define P_RPM 5
 
 request requests[] = {
-    {SWITCHES, RAW, "SWITCHES", "Unknown"},
-    {BATT_VOLTAGE, P_12V, "Battery", "V"},
-    {ACC_ENRICH, RAW, "Acceleration enrichment", "%"},
-    {COOLANT_TEMP, RAW, "Coolant Temperature", "C"},
-    {ENGINE_SPEED, RAW, "Engine Speed", "RPM"},
+    {SWITCHES, RAW, "switches", "Unknown"},
+    {BATT_VOLTAGE, P_12V, "battery", "V"},
+    {ACC_ENRICH, RAW, "acc enrich", "%"},
+    {COOLANT_TEMP, RAW, "Coolant temp", "C"},
+    {ENGINE_SPEED, P_RPM, "Engine speed", "RPM"},
     {FUEL_TRIM_LOW, MIDDLE100, "Fuel Trim Low", "%"},
     {FUEL_TRIM_MID, MIDDLE100, "Fuel Trim Mid", "%"},
     {FUEL_TRIM_HIGH, MIDDLE100, "Fuel Trim High", "%"},
@@ -76,6 +77,10 @@ float parseZeroOne(int rawValue) {
     return rawValue * 0.01; //TODO
 }
 
+int parseRPM(int rawValue) {
+    return rawValue * 32;
+}
+
 String parseData(int data, int parser) {
     switch (parser)
     {
@@ -94,6 +99,8 @@ String parseData(int data, int parser) {
     case ZERO_ONE:
         return String(parseZeroOne(data));
         break;
+    case P_RPM:
+        return String(parseRPM(data));
     default:
         return String(data);
         break;
@@ -101,14 +108,24 @@ String parseData(int data, int parser) {
     return "1";
 };
 
+bool waitForResponse() {
+    long sentTime = millis();
+    while (Serial.available() == 0)
+    {
+        if (millis() - sentTime > 50)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool sendAndRemoveEcho(int command) {
     Serial.write(command);
-    delay(10);
-    if (Serial.available() == 0)
-    {
+    if(!waitForResponse()) {
         return false;
     }
-    
     int echo = Serial.read();
+    //echo should be same as sent command, if not, there communication problem.
     return echo == command;
 }

@@ -12,6 +12,31 @@
 
 LiquidCrystal_I2C lcd(0x3F,16,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
+long start = millis();
+int receivedResponses = 0;
+int requestPerSecond = 0;
+int lastRps = 0;
+int lastRequest = 0;
+bool error = false;
+
+void printRps() {
+  if (requestPerSecond != lastRps)
+  {
+    lcd.setCursor(14,0);
+    lcd.print(requestPerSecond);
+    lcd.print(" ");
+    lastRps = requestPerSecond;
+  }
+};
+
+void printRequestName(int i) {
+    lcd.setCursor(0,0);
+    if (lastRequest != i)
+    {
+      lcd.print(requests[i].name + "          ");
+      lastRequest = i;
+    }
+};
 
 void setup()
 {
@@ -24,36 +49,36 @@ void loop()
 {
   for (int i = 0; i < REQUESTS_SIZE; i++)
   {
-    lcd.setCursor(0,0);
-    lcd.print(requests[i].name);
-    lcd.print("           ");
-    lcd.setCursor(0,1);
-    // Serial.write(allSensors[i]);
+    i = 4;
+    printRequestName(i);
+    printRps();
     bool successSend = sendAndRemoveEcho(requests[i].addr);
     if (successSend == false)
     {
-      lcd.print("COMM ERROR");
-      delay(2000);
+      lcd.setCursor(0,1);
+      lcd.print("COMM ERROR        ");
+      error = true;
     };
-    delay(10);
     // when characters arrive over the serial port...
-  if (Serial.available()) {
-    // lcd.print("res: ");
-    while (Serial.available() > 0) {
-      // Serial.read();
-      
+    ;
+  if (waitForResponse()) {
       int readData = Serial.read();
       int parser = requests[i].parser;
-      lcd.print(parseData(readData, parser));
-      lcd.print(" ");
-      lcd.print(requests[i].unit);
-      lcd.print("               ");
-      delay(500);
+      String result = parseData(readData, parser) + " " +requests[i].unit + "               ";
+      lcd.setCursor(0,1); 
+      lcd.print(result);
+      
+      receivedResponses++;
+      
+  } else if (!error) {
+      lcd.setCursor(0,1);
+      lcd.print("RESPONSE ERROR                    ");
     }
-  } else {
-      lcd.print("RESPONSE ERROR");
-      lcd.print("               ");
-      delay(500);
+  if (millis() - start > 1000)
+    {
+      requestPerSecond = receivedResponses;
+      receivedResponses = 0;
+      start = millis();
     }
 }
 }
