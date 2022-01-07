@@ -10,6 +10,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <helpers.h>
 
+#define buttonPin 2
+
 LiquidCrystal_I2C lcd(0x3F,16,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 long start = millis();
@@ -18,9 +20,11 @@ int requestPerSecond = 0;
 int lastRps = 0;
 int lastRequest = 0;
 bool error = false;
+int currentRequest = 0;
+long buttonPressedTime = 0;
 
-void printRps() {
-  if (requestPerSecond != lastRps)
+void printRps(int forcePrint = 0) {
+  if (requestPerSecond != lastRps || forcePrint == 1)
   {
     lcd.setCursor(14,0);
     lcd.print(requestPerSecond);
@@ -35,11 +39,13 @@ void printRequestName(int i) {
     {
       lcd.print(requests[i].name + "          ");
       lastRequest = i;
+      printRps(1);
     }
 };
 
 void setup()
 {
+  pinMode(buttonPin, INPUT);
   lcd.init();                      // initialize the lcd 
   lcd.backlight();
   Serial.begin(2000);
@@ -47,9 +53,25 @@ void setup()
 
 void loop()
 {
-  for (int i = 0; i < REQUESTS_SIZE; i++)
-  {
-    i = 4;
+  int buttonState = digitalRead(buttonPin);
+  // for (int i = 0; i < REQUESTS_SIZE; i++)
+  // {
+    if (buttonState == HIGH)
+    {
+      if (millis() - buttonPressedTime < 500)
+      {
+        return;
+      } else {
+        buttonPressedTime = millis();
+        currentRequest++;
+        if (currentRequest == REQUESTS_SIZE)
+          {
+            currentRequest = 0;
+          }
+      }
+    }
+    
+    int i = currentRequest;
     printRequestName(i);
     printRps();
     bool successSend = sendAndRemoveEcho(requests[i].addr);
@@ -80,5 +102,5 @@ void loop()
       receivedResponses = 0;
       start = millis();
     }
-}
+// }
 }
