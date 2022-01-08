@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 struct request
 {
     int addr;
@@ -29,7 +27,7 @@ const int KNOCK_SUM PROGMEM = 38;
 const int TIMING_ADVANCE PROGMEM = 6;
 const int EGR_TEMP PROGMEM = 18;
 
-const int REQUESTS_SIZE PROGMEM = 24;
+const int REQUESTS_SIZE PROGMEM = 19;
 
 #define MASK_TDC 4
 #define MASK_PS 8
@@ -57,13 +55,13 @@ const int REQUESTS_SIZE PROGMEM = 24;
 #define P_IDDLE_SW 17
 
 request requests[] = {
-    {SWITCHES, P_TDC, "TDC", " "},
-    {SWITCHES, P_PS, "Power Steering", " "},
-    {SWITCHES, P_AC_SW, "A/C Switch", " "},
-    {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
-    {SWITCHES, P_IDDLE_SW, "Iddle switch", " "},
-    {BATT_VOLTAGE, P_12V, "battery", "V"},
-    {ACC_ENRICH, P_PERCENT, "acc enrich", "%"},
+    // {SWITCHES, P_TDC, "TDC", " "},
+    // {SWITCHES, P_PS, "Power Steering", " "},
+    // {SWITCHES, P_AC_SW, "A/C Switch", " "},
+    // {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
+    // {SWITCHES, P_IDDLE_SW, "Iddle switch", " "},
+    {BATT_VOLTAGE, P_12V, "Battery voltage", "V"},
+    {ACC_ENRICH, P_PERCENT, "Acceleration enrichment", "%"},
     {COOLANT_TEMP, P_COOLING_TEMP, "Coolant temp", "C"},
     {ENGINE_SPEED, P_RPM, "Engine speed", "RPM"},
     {FUEL_TRIM_LOW, P_FEEDBACK_TRIM, "Fuel Trim Low", "%"},
@@ -72,75 +70,91 @@ request requests[] = {
     {INJECTOR_PULSE, P_INJ_PULSE, "Injector Pulse", "ms"},
     {OXYGEN_FEEDBACK_TRIM, P_FEEDBACK_TRIM, "Oxygen Feedback Trim", "%"},
     {OXYGEN_SENSOR, ZERO_ONE, "Oxygen Sensor", "V"},
-    {TPS, P_PERCENT, "TPS", "%"},
+    {TPS, P_PERCENT, "Throttle Position", "%"},
     {AIR_FLOW_HZ, P_AIR_FLOW_HZ, "Air Flow", "Hz"},
     {AIR_TEMP, P_AIR_TEMP, "Air Temperature", "C"},
-    {AIR_VOLUME, RAW, "Air Volume", "raw"},
+    {AIR_VOLUME, RAW, "Air Volume", " "},
     {BARO_SENSOR, P_BARO, "Barometric Sensor", "Hpa"},
     {ISC_STEPS, RAW, "ISC steps", "Steps"},
     {KNOCK_SUM, RAW, "Knock Sum", "Knocks"},
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Timing Advance", "deg"},
-    {EGR_TEMP, P_EGR_TEMP, "Egr Temperature", "C"}
-};
+    {EGR_TEMP, P_EGR_TEMP, "Egr Temperature", "C"}};
 
-String parseWithMask(int rawValue, int mask) {
+String parseWithMask(int rawValue, int mask)
+{
     if ((rawValue & mask) == mask)
     {
         return "ON";
-    } else {
+    }
+    else
+    {
         return "OFF";
     }
 }
 
-int parseEgrTEmp(int rawValue) {
+int parseEgrTEmp(int rawValue)
+{
     return -2.14 * rawValue + 314;
 }
 
-int parseAirTemp(int rawValue) {
-    return 0.94 * rawValue + 181;
+int parseAirTemp(int rawValue)
+{
+    return -0.81 * rawValue + 153;
+    // return 0.94 * rawValue + 181;
 }
 
-int parseAirFlowHz(int rawValue) {
+int parseAirFlowHz(int rawValue)
+{
     return 6.29 * rawValue;
 }
 
-int parseTimingAdvance(int rawValue) {
+int parseTimingAdvance(int rawValue)
+{
     return rawValue - 10;
 }
 
-float parseToTwelve(int rawValue) {
-  return rawValue * 0.0733;
+float parseToTwelve(int rawValue)
+{
+    return rawValue * 0.0733;
 };
 
-int parseToPercent(int rawValue) {
+int parseToPercent(int rawValue)
+{
     return 100 * rawValue / 255;
 }
 
-int parseFeedbackTrim(int rawValue) {
+int parseFeedbackTrim(int rawValue)
+{
     return rawValue * 0.78;
 }
 
-float parseZeroOne(int rawValue) {
+float parseZeroOne(int rawValue)
+{
     return rawValue * 0.0195;
 }
 
-int parseRPM(int rawValue) {
+int parseRPM(int rawValue)
+{
     return rawValue * 31.25;
 }
 
-int parseCoolant(int rawValue) {
+int parseCoolant(int rawValue)
+{
     return -0.81 * rawValue + 153;
 }
 
-int parseInjPulse(int rawValue) {
+int parseInjPulse(int rawValue)
+{
     return 0.256 * rawValue;
 }
 
-int parseBaro(int rawValue) {
+int parseBaro(int rawValue)
+{
     return 0.00486 * rawValue;
 }
 
-String parseData(int data, int parser) {
+String parseData(int data, int parser)
+{
     switch (parser)
     {
     case RAW:
@@ -201,27 +215,4 @@ String parseData(int data, int parser) {
         return String(data);
         break;
     }
-    return "1";
 };
-
-bool waitForResponse() {
-    long sentTime = millis();
-    while (Serial.available() == 0)
-    {
-        if (millis() - sentTime > 50)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool sendAndRemoveEcho(int command) {
-    Serial.write(command);
-    if(!waitForResponse()) {
-        return false;
-    }
-    int echo = Serial.read();
-    //echo should be same as sent command, if not, there communication problem.
-    return echo == command;
-}

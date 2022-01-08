@@ -1,110 +1,81 @@
-/*
- * Displays text sent over the serial port (e.g. from the Serial Monitor) on
- * an attached LCD.
- * YWROBOT
- *Compatible with the Arduino IDE 1.0
- *Library version:1.1
- */
 #include <Arduino.h>
-#include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
 #include <helpers.h>
+#include <lcd.h>
+#include <communication.h>
+#include <buttons.h>
 
-#define prevButtonPin 2
-#define nextButtonPin 3
-
-LiquidCrystal_I2C lcd(0x3F,16,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-
+//request statistics
 long start = millis();
 int receivedResponses = 0;
 int requestPerSecond = 0;
-int lastRps = 0;
-int lastRequest = 0;
-bool error = false;
+
 int currentRequest = 0;
-long buttonPressedTime = 0;
 
-void printRps(int forcePrint = 0) {
-  if (requestPerSecond != lastRps || forcePrint == 1)
+bool error = false;
+
+void checkButtons()
+{
+  buttons buttonState = checkButtonsInput();
+  if (buttonState == NEXT)
   {
-    lcd.setCursor(14,1);
-    lcd.print(requestPerSecond);
-    lcd.print(" ");
-    lastRps = requestPerSecond;
-  }
-};
-
-void printRequestName(int i) {
-    lcd.setCursor(0,0);
-    if (lastRequest != i)
+    currentRequest++;
+    if (currentRequest == REQUESTS_SIZE)
     {
-      lcd.print(requests[i].name + "             ");
-      lastRequest = i;
-      printRps(1);
+      currentRequest = 0;
     }
-};
-
-void checkButtons() {
-  int buttonState = digitalRead(prevButtonPin);
-  if (buttonState == HIGH)
+  }
+  if (buttonState == PREVIOUS)
   {
-    if (millis() - buttonPressedTime < 500)
+    currentRequest--;
+    if (currentRequest < 0)
     {
-      return;
-    } else {
-      buttonPressedTime = millis();
-      currentRequest++;
-      if (currentRequest == REQUESTS_SIZE)
-        {
-          currentRequest = 0;
-        }
+      currentRequest = REQUESTS_SIZE - 1;
     }
   }
 }
 
 void setup()
 {
+  lcdStart();
   pinMode(prevButtonPin, INPUT);
   pinMode(nextButtonPin, INPUT);
-  lcd.init();                      // initialize the lcd 
-  lcd.backlight();
   Serial.begin(2000);
 }
 
 void loop()
 {
+  // error = false;
   checkButtons();
-  error = false;
-    int i = currentRequest;
-    printRequestName(i);
-    printRps();
-    bool successSend = sendAndRemoveEcho(requests[i].addr);
-    if (successSend == false)
+  printRequestName(currentRequest);
+  printRps(requestPerSecond);
+  bool successSend = send(requests[currentRequest].addr);
+  if (successSend == false)
+  {
+    printError("COMM ERROR");
+    error = true;
+  };
+  if (waitForResponse())
+  {
+    int readData = Serial.read();
+    receivedResponses++;
+    if (error)
     {
-      lcd.setCursor(0,1);
-      lcd.print("COMM ERROR        ");
-      error = true;
-    };
-    // when characters arrive over the serial port...
-    ;
-  if (waitForResponse()) {
-      int readData = Serial.read();
-      int parser = requests[i].parser;
-      String result = parseData(readData, parser) + " " +requests[i].unit + "               ";
-      lcd.setCursor(0,1); 
-      lcd.print(result);
-      
-      receivedResponses++;
-      
-  } else if (!error) {
-      lcd.setCursor(0,1);
-      lcd.print("RESPONSE ERROR                    ");
+      error = false;
+      printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit, true);
     }
+    else
+    {
+      printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit);
+    }
+  }
+  else if (!error)
+  {
+    printError("RESPONSE ERROR");
+  }
   if (millis() - start > 1000)
-    {
-      requestPerSecond = receivedResponses;
-      receivedResponses = 0;
-      start = millis();
-    }
-// }
+  {
+    requestPerSecond = receivedResponses;
+    receivedResponses = 0;
+    start = millis();
+  }
 }
