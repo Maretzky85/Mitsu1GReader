@@ -1,3 +1,5 @@
+const char COMM_ERR[] = "Comm Err";
+const char RESP_ERR[] = "Resp Err";
 long const maxWaitTime = 50;
 
 void clearBuffer()

@@ -2,8 +2,8 @@ struct request
 {
     int addr;
     int parser;
-    String name;
-    String unit;
+    char name[14];
+    char unit[5];
 };
 
 const int SWITCHES PROGMEM = 2;
@@ -60,25 +60,25 @@ request requests[] = {
     // {SWITCHES, P_AC_SW, "A/C Switch", " "},
     // {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
     // {SWITCHES, P_IDDLE_SW, "Iddle switch", " "},
-    {BATT_VOLTAGE, P_12V, "Battery voltage", "V"},
-    {ACC_ENRICH, P_PERCENT, "Acceleration enrichment", "%"},
-    {COOLANT_TEMP, P_COOLING_TEMP, "Coolant temp", "C"},
-    {ENGINE_SPEED, P_RPM, "Engine speed", "RPM"},
+    {BATT_VOLTAGE, P_12V, "Batt", "V"},
+    {ACC_ENRICH, P_PERCENT, "Acc enrich", "%"},
+    {COOLANT_TEMP, P_COOLING_TEMP, "Coolant", "C"},
+    {ENGINE_SPEED, P_RPM, "Engine Speed", "RPM"},
     {FUEL_TRIM_LOW, P_FEEDBACK_TRIM, "Fuel Trim Low", "%"},
     {FUEL_TRIM_MID, P_FEEDBACK_TRIM, "Fuel Trim Mid", "%"},
-    {FUEL_TRIM_HIGH, P_FEEDBACK_TRIM, "Fuel Trim High", "%"},
-    {INJECTOR_PULSE, P_INJ_PULSE, "Injector Pulse", "ms"},
-    {OXYGEN_FEEDBACK_TRIM, P_FEEDBACK_TRIM, "Oxygen Feedback Trim", "%"},
-    {OXYGEN_SENSOR, ZERO_ONE, "Oxygen Sensor", "V"},
-    {TPS, P_PERCENT, "Throttle Position", "%"},
+    {FUEL_TRIM_HIGH, P_FEEDBACK_TRIM, "Fuel Trim Hgh", "%"},
+    {INJECTOR_PULSE, P_INJ_PULSE, "Inj Pulse", "ms"},
+    {OXYGEN_FEEDBACK_TRIM, P_FEEDBACK_TRIM, "Oxygen Fdbck", "%"},
+    {OXYGEN_SENSOR, ZERO_ONE, "Oxygen Sens", "V"},
+    {TPS, P_PERCENT, "TPS", "%"},
     {AIR_FLOW_HZ, P_AIR_FLOW_HZ, "Air Flow", "Hz"},
-    {AIR_TEMP, P_AIR_TEMP, "Air Temperature", "C"},
+    {AIR_TEMP, P_AIR_TEMP, "Air Temp", "C"},
     {AIR_VOLUME, RAW, "Air Volume", " "},
-    {BARO_SENSOR, P_BARO, "Barometric Sensor", "Hpa"},
-    {ISC_STEPS, RAW, "ISC steps", "Steps"},
-    {KNOCK_SUM, RAW, "Knock Sum", "Knocks"},
-    {TIMING_ADVANCE, P_TIMING_ADVANCE, "Timing Advance", "deg"},
-    {EGR_TEMP, P_EGR_TEMP, "Egr Temperature", "C"}};
+    {BARO_SENSOR, P_BARO, "Baro Sensor", "Hpa"},
+    {ISC_STEPS, RAW, "ISC steps", "Step"},
+    {KNOCK_SUM, RAW, "Knock Sum", " "},
+    {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
+    {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
 String parseWithMask(int rawValue, int mask)
 {

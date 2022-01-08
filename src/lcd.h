@@ -1,4 +1,6 @@
-#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+#include <hd44780.h>
+#include <hd44780ioClass/hd44780_I2Cexp.h>
 
 #define LCD_COLS 16
 #define LCD_ROWS 2
@@ -6,7 +8,8 @@
 const int rps_x_position = LCD_COLS - 2;
 const int rps_y_position = LCD_ROWS - 1;
 
-LiquidCrystal_I2C lcd(0x3F, LCD_COLS, LCD_ROWS); // set the LCD address to 0x27 for a 16 chars and 2 line display
+// LiquidCrystal_I2C lcd(0x3F, LCD_COLS, LCD_ROWS); // set the LCD address to 0x27 for a 16 chars and 2 line display
+hd44780_I2Cexp lcd;
 
 //display optimalisation - dont print if same
 String lastHeaderPrinted = "";

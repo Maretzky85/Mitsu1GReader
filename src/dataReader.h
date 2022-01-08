@@ -50,7 +50,7 @@ void readAndDisplayData()
     bool successSend = send(requests[currentRequest].addr);
     if (successSend == false)
     {
-        printError("COMM ERROR");
+        printError(COMM_ERR);
         delay(250);
         error = true;
     };
@@ -70,7 +70,7 @@ void readAndDisplayData()
     }
     else if (!error)
     {
-        printError("RESPONSE ERROR");
+        printError(RESP_ERR);
         delay(250);
     }
     updateResponses();
