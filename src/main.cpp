@@ -3,36 +3,16 @@
 #include <lcd.h>
 #include <communication.h>
 #include <buttons.h>
+#include <dataReader.h>
+#include <dtcReader.h>
 
-//request statistics
-long start = millis();
-int receivedResponses = 0;
-int requestPerSecond = 0;
-
-int currentRequest = 0;
-
-bool error = false;
-
-void checkButtons()
+enum state
 {
-  buttons buttonState = checkButtonsInput();
-  if (buttonState == NEXT)
-  {
-    currentRequest++;
-    if (currentRequest == REQUESTS_SIZE)
-    {
-      currentRequest = 0;
-    }
-  }
-  if (buttonState == PREVIOUS)
-  {
-    currentRequest--;
-    if (currentRequest < 0)
-    {
-      currentRequest = REQUESTS_SIZE - 1;
-    }
-  }
-}
+  DATA_READER,
+  DTC_READER
+};
+
+state currentState = DATA_READER;
 
 void setup()
 {
@@ -44,38 +24,26 @@ void setup()
 
 void loop()
 {
-  // error = false;
-  checkButtons();
-  printRequestName(currentRequest);
-  printRps(requestPerSecond);
-  bool successSend = send(requests[currentRequest].addr);
-  if (successSend == false)
+  buttons buttonState = checkButtonsInput();
+  if (buttonState == LONG_NEXT)
   {
-    printError("COMM ERROR");
-    error = true;
-  };
-  if (waitForResponse())
-  {
-    int readData = Serial.read();
-    receivedResponses++;
-    if (error)
-    {
-      error = false;
-      printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit, true);
-    }
-    else
-    {
-      printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit);
-    }
+    currentState = DTC_READER;
   }
-  else if (!error)
+  if (buttonState == LONG_PREVIOUS)
   {
-    printError("RESPONSE ERROR");
+    currentState = DATA_READER;
   }
-  if (millis() - start > 1000)
+  
+
+  switch (currentState)
   {
-    requestPerSecond = receivedResponses;
-    receivedResponses = 0;
-    start = millis();
+  case DATA_READER:
+    setButtonState(buttonState);
+    readAndDisplayData();
+    break;
+  case DTC_READER:
+    readDtcBytes();
+  default:
+    break;
   }
 }

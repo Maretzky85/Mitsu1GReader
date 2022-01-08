@@ -1,5 +1,13 @@
 long const maxWaitTime = 50;
 
+void clearBuffer()
+{
+    while (Serial.available())
+    {
+        Serial.read();
+    }
+}
+
 bool waitForResponse()
 {
     long startWaitTime = millis();
@@ -21,6 +29,11 @@ bool send(int command)
         return false;
     }
     int echo = Serial.read();
+    if (echo != command)
+    {
+        clearBuffer();
+    }
+
     //echo should be same as sent command, if not, there communication problem.
     return echo == command;
 }

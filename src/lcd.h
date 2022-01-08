@@ -9,7 +9,7 @@ const int rps_y_position = LCD_ROWS - 1;
 LiquidCrystal_I2C lcd(0x3F, LCD_COLS, LCD_ROWS); // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 //display optimalisation - dont print if same
-int lastRequestPrinted = 0;
+String lastHeaderPrinted = "";
 int lastRpsPrinted = 0;
 String lastResultPrinted = "";
 
@@ -30,20 +30,23 @@ void printRps(int requestPerSecond = 0)
     }
 };
 
-void printRequestName(int requestNumber)
-{
-    if (lastRequestPrinted != requestNumber)
+void printHeader(String header) {
+    if (lastHeaderPrinted != header)
     {
-        String requestName = requests[requestNumber].name;
-        int rest = LCD_COLS - requestName.length();
+    int rest = LCD_COLS - header.length();
         lcd.setCursor(0, 0);
-        lcd.print(requestName);
-        lastRequestPrinted = requestNumber;
+        lcd.print(header);
+        lastHeaderPrinted = header;
         for (int i = 0; i < rest; i++)
         {
             lcd.print(" ");
         }
     }
+}
+
+void printRequestName(int requestNumber)
+{
+    printHeader(requests[requestNumber].name);
 };
 
 void printError(String errorName)
