@@ -29,7 +29,13 @@ const int KNOCK_SUM PROGMEM = 38;
 const int TIMING_ADVANCE PROGMEM = 6;
 const int EGR_TEMP PROGMEM = 18;
 
-const int REQUESTS_SIZE PROGMEM = 20;
+const int REQUESTS_SIZE PROGMEM = 24;
+
+#define MASK_TDC 4
+#define MASK_PS 8
+#define MASK_AC_SW 16
+#define MASK_PARK_N 32
+#define MASK_IDDLE_SW 128
 
 #define RAW 0
 #define P_12V 1
@@ -44,9 +50,18 @@ const int REQUESTS_SIZE PROGMEM = 20;
 #define P_AIR_TEMP 10
 #define P_BARO 11
 #define P_EGR_TEMP 12
+#define P_TDC 13
+#define P_PS 14
+#define P_AC_SW 15
+#define P_PARK_NEUTRAL 16
+#define P_IDDLE_SW 17
 
 request requests[] = {
-    {SWITCHES, RAW, "switches", "Unknown"},
+    {SWITCHES, P_TDC, "TDC", " "},
+    {SWITCHES, P_PS, "Power Steering", " "},
+    {SWITCHES, P_AC_SW, "A/C Switch", " "},
+    {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
+    {SWITCHES, P_IDDLE_SW, "Iddle switch", " "},
     {BATT_VOLTAGE, P_12V, "battery", "V"},
     {ACC_ENRICH, P_PERCENT, "acc enrich", "%"},
     {COOLANT_TEMP, P_COOLING_TEMP, "Coolant temp", "C"},
@@ -67,6 +82,15 @@ request requests[] = {
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Timing Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temperature", "C"}
 };
+
+String parseWithMask(int rawValue, int mask) {
+    if ((rawValue & mask) == mask)
+    {
+        return "ON";
+    } else {
+        return "OFF";
+    }
+}
 
 int parseEgrTEmp(int rawValue) {
     return -2.14 * rawValue + 314;
@@ -157,6 +181,21 @@ String parseData(int data, int parser) {
         break;
     case P_EGR_TEMP:
         return String(parseEgrTEmp(data));
+        break;
+    case P_TDC:
+        return parseWithMask(data, MASK_TDC);
+        break;
+    case P_PS:
+        return parseWithMask(data, MASK_PS);
+        break;
+    case P_AC_SW:
+        return parseWithMask(data, MASK_AC_SW);
+        break;
+    case P_PARK_NEUTRAL:
+        return parseWithMask(data, MASK_PARK_N);
+        break;
+    case P_IDDLE_SW:
+        return parseWithMask(data, MASK_IDDLE_SW);
         break;
     default:
         return String(data);
