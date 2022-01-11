@@ -3,12 +3,6 @@
 #define nextButtonPin 3
 #define longPressTime 500
 
-long prevButtonPressedTime = 0;
-boolean prevButtonPressed = false;
-
-long nextButtonPressedTime = 0;
-boolean nextButtonPressed = false;
-
 enum buttons
 {
     NEXT,
@@ -17,6 +11,14 @@ enum buttons
     LONG_PREVIOUS,
     NONE
 };
+
+buttons buttonState = NONE;
+
+long prevButtonPressedTime = 0;
+boolean prevButtonPressed = false;
+
+long nextButtonPressedTime = 0;
+boolean nextButtonPressed = false;
 
 buttons checkButtonsInput()
 {
@@ -54,4 +56,9 @@ buttons checkButtonsInput()
         nextButtonPressedTime = millis();
     }
     return NONE;
+}
+
+
+void updateButtonsState() {
+    buttonState = checkButtonsInput();
 }

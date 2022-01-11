@@ -1,8 +1,8 @@
 #include <Arduino.h>
+#include <buttons.h>
 #include <helpers.h>
 #include <lcd.h>
 #include <communication.h>
-#include <buttons.h>
 #include <dataReader.h>
 #include <dtcReader.h>
 
@@ -13,7 +13,6 @@ enum state
 };
 
 state currentState = DATA_READER;
-
 void setup()
 {
   lcdStart();
@@ -24,7 +23,7 @@ void setup()
 
 void loop()
 {
-  buttons buttonState = checkButtonsInput();
+  updateButtonsState();
   if (buttonState == LONG_NEXT)
   {
     currentState = DTC_READER;
@@ -38,7 +37,6 @@ void loop()
   switch (currentState)
   {
   case DATA_READER:
-    setButtonState(buttonState);
     readAndDisplayData();
     break;
   case DTC_READER:

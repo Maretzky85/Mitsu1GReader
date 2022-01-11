@@ -6,12 +6,6 @@ int currentRequest = 0;
 
 bool error = false;
 
-buttons _dataReaderButtonState = NONE;
-
-void setButtonState(buttons state) {
-    _dataReaderButtonState = state;
-}
-
 void updateResponses()
 {
     if (millis() - start > 1000)
@@ -24,7 +18,7 @@ void updateResponses()
 
 void checkButtons()
 {
-    if (_dataReaderButtonState == NEXT)
+    if (buttonState == NEXT)
     {
         currentRequest++;
         if (currentRequest == MAX_REQUEST)
@@ -32,7 +26,7 @@ void checkButtons()
             currentRequest = 0;
         }
     }
-    if (_dataReaderButtonState == PREVIOUS)
+    if (buttonState == PREVIOUS)
     {
         currentRequest--;
         if (currentRequest < 0)
