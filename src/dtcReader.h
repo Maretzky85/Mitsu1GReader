@@ -48,39 +48,21 @@ bool parseDtcWithMask(unsigned int rawValue, unsigned int mask)
 void readDtcBytes()
 {
     char dtcResult[14] = {' '};
-    int low = 0;
-    int high = 0;
-    printHeader("DTC READER");
-    bool sendLow = send(stored_low);
-    if (sendLow)
+    int lowByte = getResponseFromAddr(stored_low);
+    delay(5);
+    int highByte = getResponseFromAddr(stored_high);
+    if (lowByte == COMMUNICATION_COMM_ERR || highByte == COMMUNICATION_COMM_ERR)
     {
-        if (waitForResponse())
-        {
-            low = Serial.read();
-        }
-        else
-        {
-            printError(RESP_ERR);
-        }
+        printError(COMM_ERR);
+    }
+    else if (lowByte == COMMUNICATION_RESP_ERR || highByte == COMMUNICATION_RESP_ERR)
+    {
+        printError(RESP_ERR);
     }
     else
     {
-        printError(COMM_ERR);
-        delay(250);
-    }
-    delay(5);
-    bool sendHigh = send(stored_high);
-    if (sendHigh)
-    {
-        if (waitForResponse())
-        {
-            high = Serial.read();
-        }
-        else
-        {
-            printError(RESP_ERR);
-        }
-        unsigned int word = high * 256 + low;
+        printHeader("DTC READER");
+        unsigned int word = highByte * 256 + lowByte;
 
         int presentErrors = 0;
         for (int i = 0; i < errorsCount; i++)
@@ -109,10 +91,5 @@ void readDtcBytes()
             }
         }
         // printResult("No errors", " ");
-    }
-    else
-    {
-        printError(COMM_ERR);
-        delay(250);
     }
 }

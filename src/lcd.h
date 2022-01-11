@@ -52,9 +52,10 @@ void printRequestName(int requestNumber)
     printHeader(requests[requestNumber].name);
 };
 
-void printError(String errorName)
+void printError(char errorName[])
 {
-    int rest = LCD_COLS - errorName.length() -2;
+    // int rest = LCD_COLS - errorName.length() -2; //TODO automatic calculation for rest of row
+    int rest = LCD_COLS - 8;
     lcd.setCursor(0, 1);
     lcd.print(errorName);
     for (int i = 0; i < rest; i++)
