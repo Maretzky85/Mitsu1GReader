@@ -1,8 +1,8 @@
-#define stored_low 0x3B
-#define stored_high 0x3C
-
-
+#define stored_low 0x38
+#define stored_high 0x39
+#define NO_DTC "NO ERRORS"
 int currentErrorsPresent = 0;
+int displayingError = 0;
 
 struct DTC
 {
@@ -47,6 +47,7 @@ bool parseDtcWithMask(unsigned int rawValue, unsigned int mask)
 
 void readDtcBytes()
 {
+    char dtcResult[14] = {' '};
     int low = 0;
     int high = 0;
     printHeader("DTC READER");
@@ -56,8 +57,6 @@ void readDtcBytes()
         if (waitForResponse())
         {
             low = Serial.read();
-            String result = String(low);
-            // printResult(result, "DTC");
         }
         else
         {
@@ -69,14 +68,13 @@ void readDtcBytes()
         printError(COMM_ERR);
         delay(250);
     }
+    delay(5);
     bool sendHigh = send(stored_high);
     if (sendHigh)
     {
         if (waitForResponse())
         {
             high = Serial.read();
-            String result = String(high);
-            // printResult(result, "DTC");
         }
         else
         {
@@ -84,19 +82,33 @@ void readDtcBytes()
         }
         unsigned int word = high * 256 + low;
 
-        // bool on = parseDtcWithMask(word, errors[0].mask);
-        // String result = String(on);
-        currentErrorsPresent = 0;
+        int presentErrors = 0;
         for (int i = 0; i < errorsCount; i++)
         {
-            bool on = parseDtcWithMask(word, errors[i].mask);
-            if (on)
+            bool isOn = parseDtcWithMask(word, errors[i].mask);
+            if (isOn)
             {
-                currentErrorsPresent++;
+                errors[i].on = true;
+                presentErrors++;
+            }
+            else
+            {
+                errors[i].on = false;
             }
         };
-        String result = String(currentErrorsPresent);
-        printResult(result, " ");
+        currentErrorsPresent = presentErrors;
+        printDtcCount(currentErrorsPresent);
+        for (int i = 0; i < errorsCount; i++)
+        {
+            if (errors[i].on)
+            {
+                // sprintf(dtcResult, "%s %d", errors[i].name, errors[i].code);
+                printResult(errors[i].name, " ");
+                delay(500);
+                // dtcResult = &errors[i].name;
+            }
+        }
+        // printResult("No errors", " ");
     }
     else
     {

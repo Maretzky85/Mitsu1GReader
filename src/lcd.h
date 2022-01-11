@@ -81,3 +81,9 @@ void printResult(String result, String units, boolean force = false)
         delay(1); // without drawing request is sent too fast
     }
 }
+
+void printDtcCount(int count) {
+    lcd.setCursor(14, 1);
+    lcd.print(count);
+    lcd.print(' ');
+}
