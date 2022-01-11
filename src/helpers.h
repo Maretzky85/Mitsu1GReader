@@ -81,17 +81,19 @@ request requests[] = {
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
-// String parseWithMask(int rawValue, int mask)
-// {
-//     if ((rawValue & mask) == mask)
-//     {
-//         return "ON";
-//     }
-//     else
-//     {
-//         return "OFF";
-//     }
-// }  //TODO do not use string, and move to different file 
+
+//TODO do not use string, and move to different file
+String parseWithMask(int rawValue, int mask)
+{
+    if ((rawValue & mask) == mask)
+    {
+        return "ON";
+    }
+    else
+    {
+        return "OFF";
+    }
+}   
 
 int parseEgrTEmp(int rawValue)
 {

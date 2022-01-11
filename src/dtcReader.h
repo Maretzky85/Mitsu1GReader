@@ -13,22 +13,22 @@ struct DTC
 };
 
 DTC errors[] = {
-    {11, 1, false, "Oxygen sns"},
-    {12, 2, false, "Air Flow"},
-    {13, 4, false, "Air Temp"},
-    {14, 8, false, "TPS"},
-    {15, 16, false, "ISC mtr"},
-    {21, 32, false, "Coolant"},
-    {22, 64, false, "Speed"},
-    {23, 128, false, "TDC"},
-    {24, 256, false, "Speed"},
-    {25, 512, false, "Baro"},
-    {31, 1024, false, "Knock"},
-    {41, 2048, false, "Injector"},
-    {42, 4096, false, "FP relay"},
-    {43, 8192, false, "EGR"},
-    {44, 16384, false, "Ign coil"},
-    {36, 32768, false, "Ign circuit"},
+    {11, 0x0001, false, "Oxygen sns"},
+    {12, 0x0002, false, "Air Flow"},
+    {13, 0x0004, false, "Air Temp"},
+    {14, 0x0008, false, "TPS"},
+    {15, 0x0010, false, "ISC mtr"},
+    {21, 0x0020, false, "Coolant"},
+    {22, 0x0040, false, "Speed"},
+    {23, 0x0080, false, "TDC"},
+    {24, 0x0100, false, "Speed"},
+    {25, 0x0200, false, "Baro"},
+    {31, 0x0400, false, "Knock"},
+    {41, 0x0800, false, "Injector"},
+    {42, 0x1000, false, "FP relay"},
+    {43, 0x2000, false, "EGR"},
+    {44, 0x4000, false, "Ign coil"},
+    {36, 0x8000, false, "Ign circuit"},
 };
 
 int errorsCount = 16;
