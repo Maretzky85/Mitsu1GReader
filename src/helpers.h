@@ -6,28 +6,29 @@ struct request
     char unit[5];
 };
 
-const int SWITCHES PROGMEM = 2;
-const int BATT_VOLTAGE PROGMEM = 20;
-const int ACC_ENRICH PROGMEM = 0x1D;
-const int COOLANT_TEMP PROGMEM = 0x07;
-const int ENGINE_SPEED PROGMEM = 33;
-const int FUEL_TRIM_LOW PROGMEM = 12;
-const int FUEL_TRIM_MID PROGMEM = 13;
-const int FUEL_TRIM_HIGH PROGMEM = 14;
-const int INJECTOR_PULSE PROGMEM = 41;
-const int OXYGEN_FEEDBACK_TRIM PROGMEM = 15;
-const int OXYGEN_SENSOR PROGMEM = 19;
-const int TPS PROGMEM = 23;
-const int AIR_FLOW_HZ PROGMEM = 26;
-const int AIR_TEMP PROGMEM = 58;
-const int AIR_VOLUME PROGMEM = 44;
-const int BARO_SENSOR PROGMEM = 21;
-const int ISC_STEPS PROGMEM = 22;
-const int KNOCK_SUM PROGMEM = 38;
-const int TIMING_ADVANCE PROGMEM = 6;
-const int EGR_TEMP PROGMEM = 18;
-
-const int REQUESTS_SIZE PROGMEM = 19;
+enum requests_addr {
+SWITCHES = 0x02,
+BATT_VOLTAGE = 0x14,
+ACC_ENRICH = 0x1D,
+COOLANT_TEMP  = 0x07,
+ENGINE_SPEED  = 0x21,
+FUEL_TRIM_LOW = 0x0C,
+FUEL_TRIM_MID = 0x0D,
+FUEL_TRIM_HIGH = 0x0E,
+INJECTOR_PULSE = 0x29,
+OXYGEN_FEEDBACK_TRIM = 0x0F,
+OXYGEN_SENSOR= 0x13,
+TPS = 0x17,
+AIR_FLOW_HZ = 0x1A,
+AIR_TEMP = 0x3A,
+AIR_VOLUME = 0x2C,
+BARO_SENSOR = 0x15,
+ISC_STEPS = 0x16,
+KNOCK_SUM = 0x26,
+TIMING_ADVANCE = 0x06,
+EGR_TEMP = 0x12,
+MAX_REQUEST
+};
 
 #define MASK_TDC 4
 #define MASK_PS 8
@@ -35,10 +36,10 @@ const int REQUESTS_SIZE PROGMEM = 19;
 #define MASK_PARK_N 32
 #define MASK_IDDLE_SW 128
 
-#define RAW 0
+#define P_RAW 0
 #define P_12V 1
 #define P_FEEDBACK_TRIM 2
-#define ZERO_ONE 3
+#define P_ZERO_ONE 3
 #define P_PERCENT 4
 #define P_RPM 5
 #define P_TIMING_ADVANCE 6
@@ -59,7 +60,7 @@ request requests[] = {
     // {SWITCHES, P_PS, "Power Steering", " "},
     // {SWITCHES, P_AC_SW, "A/C Switch", " "},
     // {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
-    // {SWITCHES, P_IDDLE_SW, "Iddle switch", " "},
+    // {SWITCHES, P_IDDLE_SW, "Iddle switch", " "}, //TODO move to different routine
     {BATT_VOLTAGE, P_12V, "Batt", "V"},
     {ACC_ENRICH, P_PERCENT, "Acc enrich", "%"},
     {COOLANT_TEMP, P_COOLING_TEMP, "Coolant", "C"},
@@ -69,28 +70,28 @@ request requests[] = {
     {FUEL_TRIM_HIGH, P_FEEDBACK_TRIM, "Fuel Trim Hgh", "%"},
     {INJECTOR_PULSE, P_INJ_PULSE, "Inj Pulse", "ms"},
     {OXYGEN_FEEDBACK_TRIM, P_FEEDBACK_TRIM, "Oxygen Fdbck", "%"},
-    {OXYGEN_SENSOR, ZERO_ONE, "Oxygen Sens", "V"},
+    {OXYGEN_SENSOR, P_ZERO_ONE, "Oxygen Sens", "V"},
     {TPS, P_PERCENT, "TPS", "%"},
     {AIR_FLOW_HZ, P_AIR_FLOW_HZ, "Air Flow", "Hz"},
     {AIR_TEMP, P_AIR_TEMP, "Air Temp", "C"},
-    {AIR_VOLUME, RAW, "Air Volume", " "},
+    {AIR_VOLUME, P_RAW, "Air Volume", " "},
     {BARO_SENSOR, P_BARO, "Baro Sensor", "Hpa"},
-    {ISC_STEPS, RAW, "ISC steps", "Step"},
-    {KNOCK_SUM, RAW, "Knock Sum", " "},
+    {ISC_STEPS, P_RAW, "ISC steps", "Step"},
+    {KNOCK_SUM, P_RAW, "Knock Sum", " "},
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
-String parseWithMask(int rawValue, int mask)
-{
-    if ((rawValue & mask) == mask)
-    {
-        return "ON";
-    }
-    else
-    {
-        return "OFF";
-    }
-}
+// String parseWithMask(int rawValue, int mask)
+// {
+//     if ((rawValue & mask) == mask)
+//     {
+//         return "ON";
+//     }
+//     else
+//     {
+//         return "OFF";
+//     }
+// }  //TODO do not use string, and move to different file 
 
 int parseEgrTEmp(int rawValue)
 {
@@ -99,8 +100,8 @@ int parseEgrTEmp(int rawValue)
 
 int parseAirTemp(int rawValue)
 {
-    return -0.81 * rawValue + 153;
-    // return 0.94 * rawValue + 181;
+    // return -0.81 * rawValue + 153;
+    return -0.94 * rawValue + 181;
 }
 
 int parseAirFlowHz(int rawValue)
@@ -157,7 +158,7 @@ String parseData(int data, int parser)
 {
     switch (parser)
     {
-    case RAW:
+    case P_RAW:
         return String(data);
         break;
     case P_12V:
@@ -169,7 +170,7 @@ String parseData(int data, int parser)
     case P_FEEDBACK_TRIM:
         return String(parseFeedbackTrim(data));
         break;
-    case ZERO_ONE:
+    case P_ZERO_ONE:
         return String(parseZeroOne(data));
         break;
     case P_RPM:

@@ -27,7 +27,7 @@ void checkButtons()
     if (_dataReaderButtonState == NEXT)
     {
         currentRequest++;
-        if (currentRequest == REQUESTS_SIZE)
+        if (currentRequest == MAX_REQUEST)
         {
             currentRequest = 0;
         }
@@ -37,7 +37,7 @@ void checkButtons()
         currentRequest--;
         if (currentRequest < 0)
         {
-            currentRequest = REQUESTS_SIZE - 1;
+            currentRequest = MAX_REQUEST - 1;
         }
     }
 }
