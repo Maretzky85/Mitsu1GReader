@@ -59,6 +59,6 @@ buttons checkButtonsInput()
 }
 
 
-void updateButtonsState() {
+void readButtonsState() {
     buttonState = checkButtonsInput();
 }

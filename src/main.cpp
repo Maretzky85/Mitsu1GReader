@@ -6,13 +6,18 @@
 #include <dataReader.h>
 #include <dtcReader.h>
 
-enum state
+#define DATA_READER 0
+#define DTC_READER 1
+#define MAX_STATE 2
+
+int state[3]
 {
   DATA_READER,
-  DTC_READER
+  DTC_READER,
+  MAX_STATE
 };
 
-state currentState = DATA_READER;
+int currentState = DATA_READER;
 void setup()
 {
   lcdStart();
@@ -21,19 +26,33 @@ void setup()
   Serial.begin(2000);
 }
 
-void loop()
+void updateState()
 {
-  updateButtonsState();
+  readButtonsState();
   if (buttonState == LONG_NEXT)
   {
-    currentState = DTC_READER;
+    currentState++;
+    if (currentState == MAX_STATE)
+    {
+      currentState = 0;
+    }
   }
   if (buttonState == LONG_PREVIOUS)
   {
-    currentState = DATA_READER;
+    if (currentState == 0)
+    {
+      currentState = sizeof(state) / sizeof(*state) - 1;
+    }
+    else
+    {
+      currentState--;
+    }
   }
-  
+}
 
+void loop()
+{
+  updateState();
   switch (currentState)
   {
   case DATA_READER:
