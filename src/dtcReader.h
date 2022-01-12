@@ -1,6 +1,7 @@
 #define stored_low 0x38
 #define stored_high 0x39
-#define NO_DTC "NO ERRORS"
+#define NO_DTC -1
+char NO_ERRORS[] = "NO ERRORS";
 int currentErrorsPresent = 0;
 int displayingError = 0;
 
@@ -32,6 +33,7 @@ DTC errors[] = {
 };
 
 int errorsCount = 16;
+int currentErrorShowed = NO_DTC;
 
 bool parseDtcWithMask(unsigned int rawValue, unsigned int mask)
 {
@@ -45,9 +47,84 @@ bool parseDtcWithMask(unsigned int rawValue, unsigned int mask)
     }
 }
 
-void readDtcBytes()
+void updateDTCState(unsigned int dtcRawState)
 {
-    char dtcResult[14] = {' '};
+    int presentErrors = 0;
+    for (int i = 0; i < errorsCount; i++)
+    {
+        bool isOn = parseDtcWithMask(dtcRawState, errors[i].mask);
+        if (isOn)
+        {
+            errors[i].on = true;
+            presentErrors++;
+        }
+        else
+        {
+            errors[i].on = false;
+        }
+    };
+    currentErrorsPresent = presentErrors;
+}
+
+void printFirstError()
+{
+    for (int i = 0; i < errorsCount; i++)
+    {
+        if (errors[i].on)
+        {
+            printDTC(errors[i].code, errors[i].name);
+            break;
+        }
+    }
+}
+
+void printErrorIndex(int index)
+{
+    printDTC(errors[index].code, errors[index].name);
+}
+
+void setNextDtc()
+{
+    int currentErrorIndex = currentErrorShowed;
+    int startPosition = 0;
+    if (currentErrorShowed != NO_DTC)
+    {
+        startPosition = currentErrorShowed;
+    }
+
+    for (int i = startPosition; i < errorsCount; i++)
+    {
+        if (errors[i].on)
+        {
+            currentErrorShowed = i;
+            break;
+        }
+    }
+    bool nextFound = currentErrorIndex == currentErrorShowed;
+    if (!nextFound)
+    {
+        for (int i = 0; i < currentErrorShowed; i++)
+        {
+            if (errors[i].on)
+            {
+                currentErrorShowed = i;
+                break;
+            }
+        }
+    }
+}
+
+void dtc_checkButtons()
+{
+    if (buttonState == PREVIOUS)
+    {
+        setNextDtc();
+    }
+}
+
+void readDtc()
+{
+    printHeader("DTC READER");
     int lowByte = getResponseFromAddr(stored_low);
     delay(5);
     int highByte = getResponseFromAddr(stored_high);
@@ -61,35 +138,28 @@ void readDtcBytes()
     }
     else
     {
-        printHeader("DTC READER");
         unsigned int word = highByte * 256 + lowByte;
+        updateDTCState(word);
 
-        int presentErrors = 0;
-        for (int i = 0; i < errorsCount; i++)
+        printDtcCount(currentErrorsPresent);
+
+        dtc_checkButtons();
+
+        if (currentErrorsPresent != 0)
         {
-            bool isOn = parseDtcWithMask(word, errors[i].mask);
-            if (isOn)
+            if (currentErrorShowed == NO_DTC || currentErrorsPresent > 1)
             {
-                errors[i].on = true;
-                presentErrors++;
+                printFirstError();
             }
             else
             {
-                errors[i].on = false;
-            }
-        };
-        currentErrorsPresent = presentErrors;
-        printDtcCount(currentErrorsPresent);
-        for (int i = 0; i < errorsCount; i++)
-        {
-            if (errors[i].on)
-            {
-                // sprintf(dtcResult, "%s %d", errors[i].name, errors[i].code);
-                printResult(errors[i].name, " ");
-                delay(500);
-                // dtcResult = &errors[i].name;
+                printDTC(errors[currentErrorShowed].code, errors[currentErrorShowed].name);
             }
         }
-        // printResult("No errors", " ");
+        else
+        {
+            printResult(NO_ERRORS, "");
+            currentErrorShowed = NO_DTC;
+        }
     }
 }

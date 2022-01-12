@@ -59,7 +59,7 @@ void loop()
     readAndDisplayData();
     break;
   case DTC_READER:
-    readDtcBytes();
+    readDtc();
   default:
     break;
   }

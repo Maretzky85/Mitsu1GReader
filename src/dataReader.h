@@ -45,7 +45,6 @@ void readAndDisplayData()
     if (successSend == false)
     {
         printError(COMM_ERR);
-        delay(250);
         error = true;
     };
     if (waitForResponse())
@@ -65,7 +64,6 @@ void readAndDisplayData()
     else if (!error)
     {
         printError(RESP_ERR);
-        delay(250);
     }
     updateResponses();
 }

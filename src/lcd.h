@@ -15,6 +15,7 @@ hd44780_I2Cexp lcd;
 String lastHeaderPrinted = "";
 int lastRpsPrinted = 0;
 String lastResultPrinted = "";
+int lastDTCIdPrinted = 0;
 
 void lcdStart()
 {
@@ -62,6 +63,19 @@ void printError(char errorName[])
     {
         lcd.print(" ");
     }
+}
+
+void printDTC(int dtcCode, char dtcName[]) {
+    if (lastDTCIdPrinted != dtcCode)
+    {
+        lastDTCIdPrinted = dtcCode;
+        lcd.setCursor(0, 1);
+        lcd.print(dtcCode);
+        lcd.print(" ");
+        lcd.print(dtcName);
+        lcd.print("   ");
+    }
+    
 }
 
 void printResult(String result, String units, boolean force = false)
