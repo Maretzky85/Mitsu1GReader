@@ -53,12 +53,12 @@ void readAndDisplayData()
         receivedResponses++;
         if (!error)
         {
-            printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit);
+            printResult(parseData(readData, &requests[currentRequest]));
         }
         else
         {
             error = false;
-            printResult(parseData(readData, requests[currentRequest].parser), requests[currentRequest].unit, true);
+            printResult(parseData(readData, &requests[currentRequest]), true);
         }
     }
     else if (!error)

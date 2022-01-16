@@ -28,7 +28,7 @@ void setup()
 
 void updateState()
 {
-  readButtonsState();
+  updateButtonsState();
   if (buttonState == LONG_NEXT)
   {
     currentState++;

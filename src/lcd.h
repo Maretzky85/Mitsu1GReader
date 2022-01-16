@@ -8,7 +8,6 @@
 const int rps_x_position = LCD_COLS - 2;
 const int rps_y_position = LCD_ROWS - 1;
 
-// LiquidCrystal_I2C lcd(0x3F, LCD_COLS, LCD_ROWS); // set the LCD address to 0x27 for a 16 chars and 2 line display
 hd44780_I2Cexp lcd;
 
 //display optimalisation - dont print if same
@@ -78,22 +77,15 @@ void printDTC(int dtcCode, char dtcName[]) {
     
 }
 
-void printResult(String result, String units, boolean force = false)
+void printResult(char * result, boolean force = false)
 {
     if (lastResultPrinted != result || force)
     {
         lastResultPrinted = result;
         lcd.setCursor(0, 1);
-        int rest = LCD_COLS - result.length() - units.length() - 3;
         lcd.print(result);
-        lcd.print(" ");
-        lcd.print(units);
-        for (int i = 0; i < rest; i++)
-        {
-            lcd.print(" ");
-        }
     } else {
-        delay(1); // without drawing request is sent too fast
+        delay(1); // without drawing next request is sent too fast. 1ms delay is enough.
     }
 }
 

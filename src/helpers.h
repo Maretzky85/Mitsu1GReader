@@ -1,3 +1,4 @@
+const char *EMPTY[] = {""};
 struct request
 {
     int addr;
@@ -6,28 +7,29 @@ struct request
     char unit[5];
 };
 
-enum requests_addr {
-SWITCHES = 0x02,
-BATT_VOLTAGE = 0x14,
-ACC_ENRICH = 0x1D,
-COOLANT_TEMP  = 0x07,
-ENGINE_SPEED  = 0x21,
-FUEL_TRIM_LOW = 0x0C,
-FUEL_TRIM_MID = 0x0D,
-FUEL_TRIM_HIGH = 0x0E,
-INJECTOR_PULSE = 0x29,
-OXYGEN_FEEDBACK_TRIM = 0x0F,
-OXYGEN_SENSOR= 0x13,
-TPS = 0x17,
-AIR_FLOW_HZ = 0x1A,
-AIR_TEMP = 0x3A,
-AIR_VOLUME = 0x2C,
-BARO_SENSOR = 0x15,
-ISC_STEPS = 0x16,
-KNOCK_SUM = 0x26,
-TIMING_ADVANCE = 0x06,
-EGR_TEMP = 0x12,
-MAX_REQUEST
+enum requests_addr
+{
+    SWITCHES = 0x02,
+    BATT_VOLTAGE = 0x14,
+    ACC_ENRICH = 0x1D,
+    COOLANT_TEMP = 0x07,
+    ENGINE_SPEED = 0x21,
+    FUEL_TRIM_LOW = 0x0C,
+    FUEL_TRIM_MID = 0x0D,
+    FUEL_TRIM_HIGH = 0x0E,
+    INJECTOR_PULSE = 0x29,
+    OXYGEN_FEEDBACK_TRIM = 0x0F,
+    OXYGEN_SENSOR = 0x13,
+    TPS = 0x17,
+    AIR_FLOW_HZ = 0x1A,
+    AIR_TEMP = 0x3A,
+    AIR_VOLUME = 0x2C,
+    BARO_SENSOR = 0x15,
+    ISC_STEPS = 0x16,
+    KNOCK_SUM = 0x26,
+    TIMING_ADVANCE = 0x06,
+    EGR_TEMP = 0x12,
+    MAX_REQUEST
 };
 
 #define MASK_TDC 4
@@ -55,6 +57,8 @@ MAX_REQUEST
 #define P_PARK_NEUTRAL 16
 #define P_IDDLE_SW 17
 
+char buffer[14] = "";
+
 request requests[] = {
     // {SWITCHES, P_TDC, "TDC", " "},
     // {SWITCHES, P_PS, "Power Steering", " "},
@@ -81,141 +85,154 @@ request requests[] = {
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
-
 //TODO do not use string, and move to different file
-String parseWithMask(int rawValue, int mask)
-{
-    if ((rawValue & mask) == mask)
-    {
-        return "ON";
-    }
-    else
-    {
-        return "OFF";
-    }
-}   
+// bool parseWithMask(int rawValue, int mask)
+// {
+//     return (rawValue & mask) == mask;
+// }
 
-int parseEgrTEmp(int rawValue)
+void parseEgrTEmp(int rawValue, char* unit)
 {
-    return -2.14 * rawValue + 314;
+    int result = -2.14 * rawValue + 314;
+    sprintf(buffer, "%4s%3d %-6s", *EMPTY, result, unit);
 }
 
-int parseAirTemp(int rawValue)
+void parseAirTemp(int rawValue, char* unit)
 {
     // return -0.81 * rawValue + 153;
-    return -0.94 * rawValue + 181;
+    int result = -0.94 * rawValue + 181;
+    sprintf(buffer, "%4s%3d %-6s", *EMPTY, result, unit);
 }
 
-int parseAirFlowHz(int rawValue)
+void parseAirFlowHz(int rawValue, char* unit)
 {
-    return 6.29 * rawValue;
+    int result = 6.29 * rawValue;
+    sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
 }
 
-int parseTimingAdvance(int rawValue)
+void parseTimingAdvance(int rawValue, char* unit)
 {
-    return rawValue - 10;
+    int result = rawValue - 10;
+    sprintf(buffer, "%4s%2d %-7s", *EMPTY, result, unit);
 }
 
-float parseToTwelve(int rawValue)
+void parseToTwelve(int &rawValue, char* unit)
 {
-    return rawValue * 0.0733;
+    float result = rawValue * 0.0733f;
+    char tmpInt1 = result;
+    float tmpFrac = result - tmpInt1;
+    char tmpInt2 = trunc(tmpFrac * 100);
+    sprintf(buffer, "%3s%-2d.%-2d %-5s", *EMPTY, tmpInt1, tmpInt2, unit);
 };
 
-int parseToPercent(int rawValue)
+void parseToPercent(int rawValue, char* unit)
 {
-    return 100 * rawValue / 255;
+    int result = 100 * rawValue / 255;
+    sprintf(buffer, "%5s%3d %-5s", *EMPTY, result, unit);
 }
 
-int parseFeedbackTrim(int rawValue)
+void parseFeedbackTrim(int rawValue, char* unit)
 {
-    return rawValue * 0.78;
+    int result = rawValue * 0.78;
+    sprintf(buffer, "%5s%3d %-5s", *EMPTY, result, unit);
 }
 
-float parseZeroOne(int rawValue)
+void parseZeroOne(int rawValue, char* unit)
 {
-    return rawValue * 0.0195;
+    float result = rawValue * 0.0195f;
+    char tmpInt1 = result;
+    float tmpFrac = result - tmpInt1;
+    char tmpInt2 = trunc(tmpFrac * 100);
+    sprintf(buffer, "%3s%2d.%-2d %-5s", *EMPTY, tmpInt1, tmpInt2, unit);
 }
 
-int parseRPM(int rawValue)
+void parseRPM(int rawValue, char* unit)
 {
-    return rawValue * 31.25;
+    int result = rawValue * 31.25;
+    sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
 }
 
-int parseCoolant(int rawValue)
+void parseCoolant(int rawValue, char* unit)
 {
-    return -0.81 * rawValue + 153;
+    int result = -0.81 * rawValue + 153;
+    sprintf(buffer, "%5s%3d %-5s", *EMPTY, result, unit);
 }
 
-int parseInjPulse(int rawValue)
+void parseInjPulse(int rawValue, char* unit)
 {
-    return 0.256 * rawValue;
+    int result = 0.256 * rawValue;
+    sprintf(buffer, "%6s%2d %-5s", *EMPTY, result, unit);
 }
 
-int parseBaro(int rawValue)
+void parseBaro(int rawValue, char* unit)
 {
-    return 0.00486 * rawValue;
+    int result = 0.00486 * rawValue * 1000;
+    sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
 }
 
-String parseData(int data, int parser)
+char *parseData(int &data, request * requestData)
 {
+    int parser = requestData->parser;
     switch (parser)
     {
     case P_RAW:
-        return String(data);
+        sprintf(buffer, "%5s%3d%6s", "", data, requestData->unit);
         break;
     case P_12V:
-        return String(parseToTwelve(data));
+        parseToTwelve(data, requestData->unit);
         break;
     case P_PERCENT:
-        return String(parseToPercent(data));
+        parseToPercent(data, requestData->unit);
         break;
     case P_FEEDBACK_TRIM:
-        return String(parseFeedbackTrim(data));
+        parseFeedbackTrim(data, requestData->unit);
         break;
     case P_ZERO_ONE:
-        return String(parseZeroOne(data));
+       parseZeroOne(data, requestData->unit);
         break;
     case P_RPM:
-        return String(parseRPM(data));
+        parseRPM(data, requestData->unit);
         break;
     case P_TIMING_ADVANCE:
-        return String(parseTimingAdvance(data));
+        parseTimingAdvance(data, requestData->unit);
         break;
     case P_COOLING_TEMP:
-        return String(parseCoolant(data));
+        parseCoolant(data, requestData->unit);
         break;
     case P_INJ_PULSE:
-        return String(parseInjPulse(data));
+        parseInjPulse(data, requestData->unit);
         break;
     case P_AIR_FLOW_HZ:
-        return String(parseAirFlowHz(data));
+        parseAirFlowHz(data, requestData->unit);
         break;
     case P_AIR_TEMP:
-        return String(parseAirTemp(data));
+        parseAirTemp(data, requestData->unit);
         break;
     case P_BARO:
-        return String(parseBaro(data));
+        parseBaro(data, requestData->unit);
         break;
     case P_EGR_TEMP:
-        return String(parseEgrTEmp(data));
+        parseEgrTEmp(data, requestData->unit);
         break;
-    case P_TDC:
-        return parseWithMask(data, MASK_TDC);
-        break;
-    case P_PS:
-        return parseWithMask(data, MASK_PS);
-        break;
-    case P_AC_SW:
-        return parseWithMask(data, MASK_AC_SW);
-        break;
-    case P_PARK_NEUTRAL:
-        return parseWithMask(data, MASK_PARK_N);
-        break;
-    case P_IDDLE_SW:
-        return parseWithMask(data, MASK_IDDLE_SW);
-        break;
+
+    // case P_TDC:
+    //     return String(parseWithMask(data, MASK_TDC));
+    //     break;
+    // case P_PS:
+    //     return String(parseWithMask(data, MASK_PS));
+    //     break;
+    // case P_AC_SW:
+    //     return String(parseWithMask(data, MASK_AC_SW));
+    //     break;
+    // case P_PARK_NEUTRAL:
+    //     return String(parseWithMask(data, MASK_PARK_N));
+    //     break;
+    // case P_IDDLE_SW:
+    //     return String(parseWithMask(data, MASK_IDDLE_SW));
+    //     break;
     default:
-        return String(data);
+        sprintf(buffer, "%11s%3d", "", data);
         break;
     }
+    return buffer;
 };
