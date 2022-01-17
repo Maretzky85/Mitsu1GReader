@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <buttons.h>
-#include <helpers.h>
+
 #include <lcd.h>
 #include <communication.h>
 #include <dataReader.h>
@@ -10,14 +10,13 @@
 #define DTC_READER 1
 #define MAX_STATE 2
 
-int state[3]
+int state[2]
 {
   DATA_READER,
   DTC_READER,
-  MAX_STATE
 };
 
-int currentState = DATA_READER;
+int currentState = DTC_READER;
 void setup()
 {
   lcdStart();
@@ -32,6 +31,7 @@ void updateState()
   if (buttonState == LONG_NEXT)
   {
     currentState++;
+    clearScreen();
     if (currentState == MAX_STATE)
     {
       currentState = 0;
@@ -39,6 +39,7 @@ void updateState()
   }
   if (buttonState == LONG_PREVIOUS)
   {
+    clearScreen();
     if (currentState == 0)
     {
       currentState = sizeof(state) / sizeof(*state) - 1;
@@ -48,6 +49,7 @@ void updateState()
       currentState--;
     }
   }
+  
 }
 
 void loop()
@@ -60,6 +62,7 @@ void loop()
     break;
   case DTC_READER:
     readDtc();
+    break;
   default:
     break;
   }
