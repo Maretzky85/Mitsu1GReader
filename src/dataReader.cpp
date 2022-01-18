@@ -23,7 +23,7 @@ void checkButtons()
     if (buttonState == NEXT)
     {
         currentRequest++;
-        if (currentRequest == MAX_REQUEST)
+        if (currentRequest == MAX_REQUESTS)
         {
             currentRequest = 0;
         }
@@ -33,7 +33,7 @@ void checkButtons()
         currentRequest--;
         if (currentRequest < 0)
         {
-            currentRequest = MAX_REQUEST - 1;
+            currentRequest = MAX_REQUESTS - 1;
         }
     }
 }

@@ -34,6 +34,7 @@ request requests[] = {
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
+const int MAX_REQUESTS = sizeof(requests) / sizeof(* requests);
 
 char buffer[15] = "";
 
@@ -64,8 +65,8 @@ void parseAirFlowHz(int rawValue, char* unit)
 
 void parseTimingAdvance(int rawValue, char* unit)
 {
-    int result = rawValue - 10;
-    sprintf(buffer, "%4s%2d %-7s", *EMPTY, result, unit);
+    int result = rawValue - 20;
+    sprintf(buffer, "%6d %-7s", result, unit);
 }
 
 void parseToTwelve(int &rawValue, char* unit)

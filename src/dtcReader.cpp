@@ -1,10 +1,19 @@
 #include <dtcReader.h>
 
+const int DTC_READ = 0;
+const int DTC_CLEAR = 1;
+
+int current_state = DTC_READ;
+
+int clearErrorsList[] = {0xCA, 0x7E, 0xFA, 0xFC};
+
 int NO_DTC = -1;
-int stored_low = 0x38;
-int stored_high = 0x39;
+int stored_low = 0x3B;
+int stored_high = 0x3C;
 char DTC_HEADER[] = "DTC READER";
 char NO_ERRORS[] = "NO ERRORS";
+char DTC_CLEARED[] = "CLEARED    ";
+char DTC_CLEAR_ERR[] = "ERROR       ";
 int currentErrorsPresent = 0;
 int displayingError = 0;
 
@@ -96,7 +105,7 @@ void setNextDtc()
         startPosition = currentErrorShowed;
     }
 
-    for (int i = startPosition+1; i < errorsCount; i++)
+    for (int i = startPosition + 1; i < errorsCount; i++)
     {
         if (errors[i].on)
         {
@@ -120,9 +129,13 @@ void setNextDtc()
 
 void dtc_checkButtons()
 {
-    if (buttonState == PREVIOUS)
+    if (buttonState == NEXT)
     {
         setNextDtc();
+    }
+    if (buttonState == PREVIOUS)
+    {
+        current_state = !current_state;
     }
 }
 
@@ -165,5 +178,39 @@ void readDtc()
     {
         printResult(NO_ERRORS, "");
         currentErrorShowed = NO_DTC;
+    }
+}
+
+void clear_errors()
+{
+    for (size_t i = 0; i < 4; i++)
+    {
+        int response = getResponseFromAddr(clearErrorsList[i]);
+        if (response == 0)
+        {
+            printResult(DTC_CLEARED);
+            delay(250);
+            current_state = 0;
+            return;
+        }
+        delay(1);
+    }
+    printResult(DTC_CLEAR_ERR);
+    delay(250);
+    current_state = 0;
+}
+
+void dtcReader()
+{
+    switch (current_state)
+    {
+    case DTC_READ:
+        readDtc();
+        break;
+    case DTC_CLEAR:
+        clear_errors();
+        break;
+    default:
+        break;
     }
 }

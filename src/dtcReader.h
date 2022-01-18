@@ -4,4 +4,4 @@
 #include <buttons.h>
 #include <communication.h>
 
-void readDtc();
+void dtcReader();

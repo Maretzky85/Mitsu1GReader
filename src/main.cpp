@@ -61,7 +61,7 @@ void loop()
     readAndDisplayData();
     break;
   case DTC_READER:
-    readDtc();
+    dtcReader();
     break;
   default:
     break;

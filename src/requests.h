@@ -32,28 +32,27 @@ struct request
 enum requests_addr
 {
     SWITCHES = 0x02,
-    BATT_VOLTAGE = 0x14,
-    ACC_ENRICH = 0x1D,
+    TIMING_ADVANCE = 0x06,
     COOLANT_TEMP = 0x07,
-    ENGINE_SPEED = 0x21,
     FUEL_TRIM_LOW = 0x0C,
     FUEL_TRIM_MID = 0x0D,
     FUEL_TRIM_HIGH = 0x0E,
-    INJECTOR_PULSE = 0x29,
     OXYGEN_FEEDBACK_TRIM = 0x0F,
+    EGR_TEMP = 0x12,
     OXYGEN_SENSOR = 0x13,
-    TPS = 0x17,
-    AIR_FLOW_HZ = 0x1A,
-    AIR_TEMP = 0x3A,
-    AIR_VOLUME = 0x2C,
+    BATT_VOLTAGE = 0x14,
     BARO_SENSOR = 0x15,
     ISC_STEPS = 0x16,
+    TPS = 0x17,
+    AIR_FLOW_HZ = 0x1A,
+    ACC_ENRICH = 0x1D,
+    ENGINE_SPEED = 0x21,
     KNOCK_SUM = 0x26,
-    TIMING_ADVANCE = 0x06,
-    EGR_TEMP = 0x12,
-    MAX_REQUEST
+    INJECTOR_PULSE = 0x29,
+    AIR_VOLUME = 0x2C,
+    AIR_TEMP = 0x3A,
 };
 
 extern request requests[];
-
+extern const int MAX_REQUESTS;
 char *parseData(int &data, request * requestData);
