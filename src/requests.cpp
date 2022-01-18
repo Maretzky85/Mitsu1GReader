@@ -28,15 +28,20 @@ request requests[] = {
     {AIR_FLOW_HZ, P_AIR_FLOW_HZ, "Air Flow", "Hz"},
     {AIR_TEMP, P_AIR_TEMP, "Air Temp", "C"},
     {AIR_VOLUME, P_RAW, "Air Volume", " "},
-    {BARO_SENSOR, P_BARO, "Baro Sensor", "Hpa"},
-    {ISC_STEPS, P_RAW, "ISC steps", "Step"},
+    {BARO_SENSOR, P_BARO, "Baro Sensor", "kPa"},
+    {ISC_STEPS, P_ISC, "ISC steps", "%"},
     {KNOCK_SUM, P_RAW, "Knock Sum", " "},
     {TIMING_ADVANCE, P_TIMING_ADVANCE, "Ign Advance", "deg"},
     {EGR_TEMP, P_EGR_TEMP, "Egr Temp", "C"}};
 
-const int MAX_REQUESTS = sizeof(requests) / sizeof(* requests);
+const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
 char buffer[15] = "";
+
+int convertToCelsius(int faren)
+{
+    return (faren - 32) * 5 / 9;
+}
 
 //TODO do not use string, and move to different file
 // bool parseWithMask(int rawValue, int mask)
@@ -44,32 +49,37 @@ char buffer[15] = "";
 //     return (rawValue & mask) == mask;
 // }
 
-void parseEgrTEmp(int rawValue, char* unit)
+void parseISC(int rawValue, char *unit)
 {
-    int result = -2.14 * rawValue + 314;
+    int result = 100 * rawValue / 120;
+    sprintf(buffer, "%7d %-6s", result, unit);
+}
+
+void parseEgrTEmp(int rawValue, char *unit)
+{
+    int result = convertToCelsius(-2.7 * rawValue + 597);
     sprintf(buffer, "%4s%3d %-6s", *EMPTY, result, unit);
 }
 
-void parseAirTemp(int rawValue, char* unit)
+void parseAirTemp(int rawValue, char *unit)
 {
-    // return -0.81 * rawValue + 153;
-    int result = -0.94 * rawValue + 181;
+    int result = convertToCelsius(1.8 * rawValue + 32);
     sprintf(buffer, "%4s%3d %-6s", *EMPTY, result, unit);
 }
 
-void parseAirFlowHz(int rawValue, char* unit)
+void parseAirFlowHz(int rawValue, char *unit)
 {
-    int result = 6.29 * rawValue;
+    int result = 6.25 * rawValue;
     sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
 }
 
-void parseTimingAdvance(int rawValue, char* unit)
+void parseTimingAdvance(int rawValue, char *unit)
 {
     int result = rawValue - 20;
     sprintf(buffer, "%6d %-7s", result, unit);
 }
 
-void parseToTwelve(int &rawValue, char* unit)
+void parseToTwelve(int &rawValue, char *unit)
 {
     float result = rawValue * 0.0733f;
     char tmpInt1 = result;
@@ -78,52 +88,63 @@ void parseToTwelve(int &rawValue, char* unit)
     sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
 };
 
-void parseToPercent(int rawValue, char* unit)
+void parseToPercent(int rawValue, char *unit)
 {
     int result = 100 * rawValue / 255;
     sprintf(buffer, "%7d %-6s", result, unit);
 }
 
-void parseFeedbackTrim(int rawValue, char* unit)
+void parseFeedbackTrim(int rawValue, char *unit)
 {
-    int result = rawValue * 0.78;
+    int result = (rawValue - 128) / 5;
     sprintf(buffer, "%5s%3d %-5s", *EMPTY, result, unit);
 }
 
-void parseZeroOne(int rawValue, char* unit)
+void parseZeroOne(int rawValue, char *unit)
 {
-    float result = rawValue * 0.0195f;
+    float result = rawValue * 0.01952f;
     char tmpInt1 = result;
     float tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100);
     sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
 }
 
-void parseRPM(int rawValue, char* unit)
+void parseRPM(int rawValue, char *unit)
 {
     int result = rawValue * 31.25;
     sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
 }
 
-void parseCoolant(int rawValue, char* unit)
+void parseCoolant(int rawValue, char *unit)
 {
-    int result = -0.81 * rawValue + 153;
+    int result = convertToCelsius(1.8 * rawValue + 32);
     sprintf(buffer, "%5s%3d %-5s", *EMPTY, result, unit);
 }
 
-void parseInjPulse(int rawValue, char* unit)
+void parseInjPulse(int rawValue, char *unit)
 {
-    int result = 0.256 * rawValue;
-    sprintf(buffer, "%7d %-6s", result, unit);
+    if (rawValue != 0)
+    {
+        float result = result = rawValue / 1000;
+        char tmpInt1 = result;
+        float tmpFrac = result - tmpInt1;
+        char tmpInt2 = trunc(tmpFrac * 100);
+        sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
+    } else {
+        sprintf(buffer, "%8d %-4s", 0, unit);
+    }
 }
 
-void parseBaro(int rawValue, char* unit)
+void parseBaro(int rawValue, char *unit)
 {
-    int result = 0.00486 * rawValue * 1000;
-    sprintf(buffer, "%4s%4d %-5s", *EMPTY, result, unit);
+    float result = 0.486 * rawValue;
+    char tmpInt1 = result;
+    float tmpFrac = result - tmpInt1;
+    char tmpInt2 = trunc(tmpFrac * 100);
+    sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
 }
 
-char *parseData(int &data, request * requestData)
+char *parseData(int &data, request *requestData)
 {
     int parser = requestData->parser;
     switch (parser)
@@ -141,7 +162,7 @@ char *parseData(int &data, request * requestData)
         parseFeedbackTrim(data, requestData->unit);
         break;
     case P_ZERO_ONE:
-       parseZeroOne(data, requestData->unit);
+        parseZeroOne(data, requestData->unit);
         break;
     case P_RPM:
         parseRPM(data, requestData->unit);
@@ -167,7 +188,9 @@ char *parseData(int &data, request * requestData)
     case P_EGR_TEMP:
         parseEgrTEmp(data, requestData->unit);
         break;
-
+    case P_ISC:
+        parseISC(data, requestData->unit);
+        break;
     // case P_TDC:
     //     return String(parseWithMask(data, MASK_TDC));
     //     break;

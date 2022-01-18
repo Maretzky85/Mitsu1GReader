@@ -20,6 +20,7 @@
 #define P_AC_SW 15
 #define P_PARK_NEUTRAL 16
 #define P_IDDLE_SW 17
+#define P_ISC 18
 
 struct request
 {
