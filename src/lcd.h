@@ -17,6 +17,8 @@ void printDTC(int dtcCode, char *dtcName);
 
 void printResult(char * result, boolean force = false);
 
+void printResult(int result);
+
 void printDtcCount(int count);
 
 void clearScreen();

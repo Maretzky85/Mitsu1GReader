@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <buttons.h>
-
+#include <commands.h>
 #include <lcd.h>
 #include <communication.h>
 #include <dataReader.h>
@@ -8,12 +8,14 @@
 
 #define DATA_READER 0
 #define DTC_READER 1
-#define MAX_STATE 2
+#define COMMANDS 2
+#define MAX_STATE 3
 
-int state[2]
+int state[3]
 {
   DATA_READER,
   DTC_READER,
+  COMMANDS
 };
 
 int currentState = DTC_READER;
@@ -63,6 +65,8 @@ void loop()
   case DTC_READER:
     dtcReader();
     break;
+  case COMMANDS:
+    commands_proc();
   default:
     break;
   }

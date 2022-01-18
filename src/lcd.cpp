@@ -50,8 +50,10 @@ void printResult(char *result, boolean force)
     if (lastResultPrinted != result || force)
     {
         lastResultPrinted = result;
+        char temp[15];
+        sprintf(temp, "%-14s", result);
         lcd.setCursor(0, 1);
-        lcd.print(result);
+        lcd.print(temp);
     }
     else
     {
@@ -59,6 +61,11 @@ void printResult(char *result, boolean force)
     }
 }
 
+void printResult(int result){
+    char converted[5];
+    sprintf(converted, "%d", result);
+    printResult(converted);
+}
 
 void printDTC(int dtcCode, char dtcName[])
 {

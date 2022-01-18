@@ -1,9 +1,9 @@
 #include <communication.h>
 
-long const maxWaitTime = 50;
-
 char COMM_ERR[9] = "Comm Err";
 char RESP_ERR[9] = "Resp Err";
+
+const uint8_t MAX_WAIT_TIME = 50;
 
 void _clearBuffer()
 {
@@ -18,7 +18,7 @@ bool _waitForResponse()
     long startWaitTime = millis();
     while (Serial.available() == 0)
     {
-        if (millis() - startWaitTime > maxWaitTime)
+        if (millis() - startWaitTime > MAX_WAIT_TIME)
         {
             return false;
         }
