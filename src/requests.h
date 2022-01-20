@@ -5,8 +5,8 @@
 struct request {
     int addr;
     int parser;
-    const char * name PROGMEM;
-    const char * unit PROGMEM;
+    const char *name PROGMEM;
+    const char *unit PROGMEM;
 };
 
 enum requests_addr {

@@ -13,4 +13,4 @@ bool send(int &command);
 
 int getResponseFromAddr(int &address);
 
-int getResponseFromAddr(const uint8_t * address);
+int getResponseFromAddr(const uint8_t *address);

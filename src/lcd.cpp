@@ -2,9 +2,6 @@
 
 hd44780_I2Cexp lcd;
 
-#define LCD_COLS 20
-#define LCD_ROWS 4
-
 const int rps_x_position = LCD_COLS - 2;
 const int rps_y_position = 0;
 const int printSize = LCD_COLS - 2;
@@ -62,7 +59,7 @@ void printHeader(char *header) {
 void printHeader(const char *header) {
     if (lastPrintedHeader != header) {
         strcpy_P(temp, header);
-        snprintf(headerBuffer, printSize,headerTemplate, temp);
+        snprintf(headerBuffer, printSize, headerTemplate, temp);
         lcd.setCursor(0, 0);
         lcd.print(headerBuffer);
         lastPrintedHeader = header;

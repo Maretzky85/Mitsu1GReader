@@ -3,8 +3,7 @@
 #define prevButtonPin 2
 #define nextButtonPin 3
 
-enum buttons
-{
+enum buttons {
     NEXT,
     LONG_NEXT,
     PREVIOUS,

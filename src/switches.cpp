@@ -27,18 +27,18 @@ enum sw_id {
 
 struct sSwitch {
     const sw_id id;
-    const uint8_t * address;
+    const uint8_t *address;
     const uint8_t mask;
-    const char * name PROGMEM;
+    const char *name PROGMEM;
 };
 
 const sSwitch switches[] = {
-        {TDC, &SECOND, 0x04, TOP_DEAD_CENTER_NAME},
-        {PS, &SECOND, 0x08, POWER_STEERING_NAME},
-        {AC_SW, &SECOND, 0x10, AC_SWITCH_NAME},
+        {TDC,          &SECOND, 0x04, TOP_DEAD_CENTER_NAME},
+        {PS,           &SECOND, 0x08, POWER_STEERING_NAME},
+        {AC_SW,        &SECOND, 0x10, AC_SWITCH_NAME},
         {PARK_NEUTRAL, &SECOND, 0x20, PN_SWITCH_NAME},
-        {IDLE_SW, &SECOND, 0x80, IDLE_SWITCH_NAME},
-        {AC_CL, &FIRST, 0x20, AC_CLUTCH_NAME},
+        {IDLE_SW,      &SECOND, 0x80, IDLE_SWITCH_NAME},
+        {AC_CL,        &FIRST,  0x20, AC_CLUTCH_NAME},
 };
 
 const uint8_t switches_size = sizeof(switches) / sizeof(*switches);
@@ -53,28 +53,27 @@ void checkSwButtons() {
     }
 }
 
- bool parseWithMask(const uint8_t &rawValue, const int &mask)
- {
-     return (rawValue & mask) == mask;
- }
+bool parseWithMask(const uint8_t &rawValue, const int &mask) {
+    return (rawValue & mask) == mask;
+}
 
- void run_switches_routine() {
-     checkSwButtons();
-     printHeader(switches[current].name);
-     //TODO move checks to communication as function returning bool
-     int result = getResponseFromAddr(switches[current].address);
-     if (result == COMMUNICATION_COMM_ERR) {
-         printResult_P(COMM_ERR);
-         return;
-     }
-     //TODO move checks to communication as function returning bool
-     if (result == COMMUNICATION_RESP_ERR) {
-         printResult_P(RESP_ERR);
-         return;
-     }
-     if (parseWithMask(result, switches[current].mask)) {
-         printResult_P(ON_NAME);
-     } else {
-         printResult_P(OFF_NAME);
-     }
- }
+void run_switches_routine() {
+    checkSwButtons();
+    printHeader(switches[current].name);
+    //TODO move checks to communication as function returning bool
+    int result = getResponseFromAddr(switches[current].address);
+    if (result == COMMUNICATION_COMM_ERR) {
+        printResult_P(COMM_ERR);
+        return;
+    }
+    //TODO move checks to communication as function returning bool
+    if (result == COMMUNICATION_RESP_ERR) {
+        printResult_P(RESP_ERR);
+        return;
+    }
+    if (parseWithMask(result, switches[current].mask)) {
+        printResult_P(ON_NAME);
+    } else {
+        printResult_P(OFF_NAME);
+    }
+}
