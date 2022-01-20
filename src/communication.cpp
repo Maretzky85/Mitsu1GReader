@@ -40,6 +40,7 @@ bool send(int &command)
     return echo == command;
 }
 
+//TODO return int8_t
 int getResponseFromAddr(int &address)
 {
     if (!send(address))
@@ -57,4 +58,9 @@ int getResponseFromAddr(int &address)
         clearBuffer();
         return COMMUNICATION_RESP_ERR;
     }
+}
+
+int getResponseFromAddr(const uint8_t * address) {
+    int parsed = *address;
+    return getResponseFromAddr(parsed);
 }

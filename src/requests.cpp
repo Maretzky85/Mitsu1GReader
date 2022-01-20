@@ -50,24 +50,10 @@ enum parsers {
     P_EGR_TEMP,
     P_ISC
 };
-//#define P_TDC 13
-//#define P_PS 14
-//#define P_AC_SW 15
-//#define P_PARK_NEUTRAL 16
-//#define P_IDDLE_SW 17
 
-//#define MASK_TDC 4
-//#define MASK_PS 8
-//#define MASK_AC_SW 16
-//#define MASK_PARK_N 32
-//#define MASK_IDDLE_SW 128
 
 request requests[] = {
-        // {SWITCHES, P_TDC, "TDC", " "},
-        // {SWITCHES, P_PS, "Power Steering", " "},
-        // {SWITCHES, P_AC_SW, "A/C Switch", " "},
-        // {SWITCHES, P_PARK_NEUTRAL, "PARK/NEUTRAL", " "},
-        // {SWITCHES, P_IDDLE_SW, "Iddle switch", " "}, //TODO move to different routine
+
         {BATT_VOLTAGE,         P_12V,            BATTERY_NAME,                VOLTS_NAME},
         {ACC_ENRICH,           P_PERCENT,        ACC_ENRICHMENT_NAME,         PERCENT_NAME},
         {COOLANT_TEMP,         P_COOLING_TEMP,   COOLANT_NAME,                CELSIUS_NAME},
@@ -95,12 +81,6 @@ char buffer[15] = "";
 int convertToCelsius(double faren) {
     return (faren - 32.0) * 5 / 9; // NOLINT(cppcoreguidelines-narrowing-conversions)
 }
-
-//TODO do not use string, and move to different file
-// bool parseWithMask(int rawValue, int mask)
-// {
-//     return (rawValue & mask) == mask;
-// }
 
 void parseISC(int rawValue, char *unit) {
     int result = 100 * rawValue / 120;
@@ -230,21 +210,6 @@ char *parseData(int &data, request *requestData) {
         case P_ISC:
             parseISC(data, unit);
             break;
-            // case P_TDC:
-            //     return String(parseWithMask(data, MASK_TDC));
-            //     break;
-            // case P_PS:
-            //     return String(parseWithMask(data, MASK_PS));
-            //     break;
-            // case P_AC_SW:
-            //     return String(parseWithMask(data, MASK_AC_SW));
-            //     break;
-            // case P_PARK_NEUTRAL:
-            //     return String(parseWithMask(data, MASK_PARK_N));
-            //     break;
-            // case P_IDDLE_SW:
-            //     return String(parseWithMask(data, MASK_IDDLE_SW));
-            //     break;
         default:
             sprintf(buffer, "%11s%3d", "", data);
             break;
