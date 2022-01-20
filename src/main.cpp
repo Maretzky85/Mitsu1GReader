@@ -20,7 +20,7 @@ int state[4]
                 COMMANDS
         };
 
-int currentState = DTC_READER;
+int currentState = DATA_READER;
 
 void setup() {
     lcdStart();
