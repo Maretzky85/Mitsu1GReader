@@ -4,7 +4,7 @@
 
 //NAMES
 const char BATTERY_NAME[] PROGMEM = "Battery";
-const char ACC_ENRICHMENT_NAME[] PROGMEM = "Acc enrich";
+const char ACC_ENRICHMENT_NAME[] PROGMEM = "Accel enrich";
 const char COOLANT_NAME[] PROGMEM = "Coolant";
 const char ENGINE_SPEED_NAME[] PROGMEM = "Engine Speed";
 const char FUEL_TRIM_LOW_NAME[] PROGMEM = "Fuel Trim Low";

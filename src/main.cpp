@@ -12,6 +12,8 @@
 #define COMMANDS 3
 #define MAX_STATE 4
 
+const char WELCOME[] PROGMEM = "MitsuTester";
+
 int state[4]
         {
                 DATA_READER,
@@ -20,10 +22,12 @@ int state[4]
                 COMMANDS
         };
 
-int currentState = DTC_READER;
+int currentState = DATA_READER;
 
 void setup() {
     lcdStart();
+    printHeader(WELCOME);
+    delay(500);
     pinMode(prevButtonPin, INPUT);
     pinMode(nextButtonPin, INPUT);
     Serial.begin(2000);
