@@ -10,12 +10,11 @@ int clearErrorsList[] = {0xCA, 0x7E, 0xFA, 0xFC};
 int NO_DTC = -1;
 int stored_low = 0x3B;
 int stored_high = 0x3C;
-char DTC_HEADER[] = "DTC READER";
-char NO_ERRORS[] = "NO ERRORS";
-char DTC_CLEARED[] = "CLEARED    ";
-char DTC_CLEAR_ERR[] = "ERROR       ";
+const char DTC_HEADER[] PROGMEM = "DTC READER";
+const char NO_ERRORS[] PROGMEM = "NO ERRORS";
+const char DTC_CLEARED[] PROGMEM = "CLEARED    ";
+const char DTC_CLEAR_ERR[] PROGMEM = "ERROR       ";
 int currentErrorsPresent = 0;
-int displayingError = 0;
 
 struct DTC
 {
@@ -74,7 +73,7 @@ void updateDTCState(unsigned int dtcRawState)
         {
             errors[i].on = false;
         }
-    };
+    }
     currentErrorsPresent = presentErrors;
 }
 
@@ -176,26 +175,26 @@ void readDtc()
     }
     else
     {
-        printResult(NO_ERRORS, "");
+        printResult_P(NO_ERRORS);
         currentErrorShowed = NO_DTC;
     }
 }
 
 void clear_errors()
 {
-    for (size_t i = 0; i < 4; i++)
+    for (int & i : clearErrorsList)
     {
-        int response = getResponseFromAddr(clearErrorsList[i]);
+        int response = getResponseFromAddr(i);
         if (response == 0)
         {
-            printResult(DTC_CLEARED);
+            printResult_P(DTC_CLEARED);
             delay(250);
             current_state = 0;
             return;
         }
         delay(1);
     }
-    printResult(DTC_CLEAR_ERR);
+    printResult_P(DTC_CLEAR_ERR);
     delay(250);
     current_state = 0;
 }

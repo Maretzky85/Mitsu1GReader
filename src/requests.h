@@ -2,36 +2,14 @@
 
 #include <Arduino.h>
 
-#define P_RAW 0
-#define P_12V 1
-#define P_FEEDBACK_TRIM 2
-#define P_ZERO_ONE 3
-#define P_PERCENT 4
-#define P_RPM 5
-#define P_TIMING_ADVANCE 6
-#define P_COOLING_TEMP 7
-#define P_INJ_PULSE 8
-#define P_AIR_FLOW_HZ 9
-#define P_AIR_TEMP 10
-#define P_BARO 11
-#define P_EGR_TEMP 12
-#define P_TDC 13
-#define P_PS 14
-#define P_AC_SW 15
-#define P_PARK_NEUTRAL 16
-#define P_IDDLE_SW 17
-#define P_ISC 18
-
-struct request
-{
+struct request {
     int addr;
     int parser;
-    char name[14];
-    char unit[5];
+    const char * name PROGMEM;
+    const char * unit PROGMEM;
 };
 
-enum requests_addr
-{
+enum requests_addr {
     SWITCHES = 0x02,
     TIMING_ADVANCE = 0x06,
     COOLANT_TEMP = 0x07,
@@ -56,4 +34,5 @@ enum requests_addr
 
 extern request requests[];
 extern const int MAX_REQUESTS;
-char *parseData(int &data, request * requestData);
+
+char *parseData(int &data, request *requestData);

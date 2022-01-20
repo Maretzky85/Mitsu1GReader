@@ -11,11 +11,15 @@ void printRps(int requestPerSecond);
 
 void printHeader(char * header);
 
-void printError(char * errorName);
+void printHeader(const char *header);
+
+void printError(const char * errorName);
 
 void printDTC(int dtcCode, char *dtcName);
 
 void printResult(char * result, boolean force = false);
+
+void printResult_P(const char * result);
 
 void printResult(int result);
 

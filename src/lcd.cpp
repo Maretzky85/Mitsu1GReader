@@ -11,8 +11,10 @@ const int rps_y_position = 0;
 char headerBuffer[14];
 char resultBuffer[14];
 
+char temp[15];
+
 //display optimalisation - dont print if same
-void *lastPrintedHeader = nullptr;
+const char *lastPrintedHeader = nullptr;
 int lastRpsPrinted = 0;
 String lastResultPrinted = "";
 int lastDTCIdPrinted = 0;
@@ -32,7 +34,7 @@ void printRps(int requestPerSecond)
         lcd.print(" ");
         lastRpsPrinted = requestPerSecond;
     } 
-};
+}
 
 void printHeader(char *header)
 {
@@ -45,12 +47,23 @@ void printHeader(char *header)
     }
 }
 
+void printHeader(const char *header)
+{
+    if (lastPrintedHeader != header)
+    {
+        strcpy_P(temp, header);
+        sprintf(headerBuffer, "%-13s", temp);
+        lcd.setCursor(0, 0);
+        lcd.print(headerBuffer);
+        lastPrintedHeader = header;
+    }
+}
+
 void printResult(char *result, boolean force)
 {
     if (lastResultPrinted != result || force)
     {
         lastResultPrinted = result;
-        char temp[15];
         sprintf(temp, "%-14s", result);
         lcd.setCursor(0, 1);
         lcd.print(temp);
@@ -62,9 +75,13 @@ void printResult(char *result, boolean force)
 }
 
 void printResult(int result){
-    char converted[5];
-    sprintf(converted, "%d", result);
-    printResult(converted);
+    sprintf(temp, "%d", result);
+    printResult(temp);
+}
+
+void printResult_P(const char * result) {
+    strcpy_P(temp, result);
+    printResult(temp);
 }
 
 void printDTC(int dtcCode, char dtcName[])
@@ -78,9 +95,10 @@ void printDTC(int dtcCode, char dtcName[])
     printResult(resultBuffer);
 }
 
-void printError(char * errorName)
+void printError(const char * errorName)
 {
-    sprintf(resultBuffer, "%-13s", errorName);
+    strcpy_P(temp, errorName);
+    sprintf(resultBuffer, "%-13s", temp);
     printResult(resultBuffer);
 }
 

@@ -1,56 +1,56 @@
 #include <Arduino.h>
 #include <buttons.h>
 
-#define _longPressTime 500
+#define longPressTime 500
 
 buttons buttonState = NONE;
 
-long _prevButtonPressedTime = 0;
-bool _prevButtonPressed = false;
+unsigned long prevButtonPressedTime = 0;
+bool prevButtonPressed = false;
 
-long _nextButtonPressedTime = 0;
-bool _nextButtonPressed = false;
+unsigned long nextButtonPressedTime = 0;
+bool nextButtonPressed = false;
 
-buttons _checkButtonsInput()
+buttons checkButtonsInput()
 {
     int prevButtonState = digitalRead(prevButtonPin);
 
-    if (prevButtonState == LOW && _prevButtonPressed)
+    if (prevButtonState == LOW && prevButtonPressed)
     {
-        _prevButtonPressed = false;
-        if (millis() - _prevButtonPressedTime > _longPressTime)
+        prevButtonPressed = false;
+        if (millis() - prevButtonPressedTime > longPressTime)
         {
             return LONG_PREVIOUS;
         }
         return PREVIOUS;
     }
 
-    if (prevButtonState == HIGH && !_prevButtonPressed)
+    if (prevButtonState == HIGH && !prevButtonPressed)
     {
-        _prevButtonPressed = true;
-        _prevButtonPressedTime = millis();
+        prevButtonPressed = true;
+        prevButtonPressedTime = millis();
     }
 
     int nextButtonState = digitalRead(nextButtonPin);
 
-    if (nextButtonState == LOW && _nextButtonPressed)
+    if (nextButtonState == LOW && nextButtonPressed)
     {
-        _nextButtonPressed = false;
-        if (millis() - _nextButtonPressedTime > _longPressTime)
+        nextButtonPressed = false;
+        if (millis() - nextButtonPressedTime > longPressTime)
         {
             return LONG_NEXT;
         }
         return NEXT;
     }
 
-    if (nextButtonState == HIGH && !_nextButtonPressed)
+    if (nextButtonState == HIGH && !nextButtonPressed)
     {
-        _nextButtonPressed = true;
-        _nextButtonPressedTime = millis();
+        nextButtonPressed = true;
+        nextButtonPressedTime = millis();
     }
     return NONE;
 }
 
 void updateButtonsState() {
-    buttonState = _checkButtonsInput();
+    buttonState = checkButtonsInput();
 }

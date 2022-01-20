@@ -1,6 +1,6 @@
 #include <dataReader.h>
 
-long start = millis();
+unsigned long start = millis();
 int receivedResponses = 0;
 int requestPerSecond = 0;
 
@@ -43,13 +43,13 @@ void readAndDisplayData()
     checkButtons();
     printHeader(requests[currentRequest].name);
     printRps(requestPerSecond);
-    bool successSend = _send(requests[currentRequest].addr);
-    if (successSend == false)
+    bool successSend = send(requests[currentRequest].addr);
+    if (!successSend)
     {
         printError(COMM_ERR);
         error = true;
-    };
-    if (_waitForResponse())
+    }
+    if (waitForResponse())
     {
         int readData = Serial.read();
         receivedResponses++;

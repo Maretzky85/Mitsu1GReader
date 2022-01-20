@@ -1,11 +1,8 @@
 #include <communication.h>
 
-char COMM_ERR[9] = "Comm Err";
-char RESP_ERR[9] = "Resp Err";
-
 const uint8_t MAX_WAIT_TIME = 50;
 
-void _clearBuffer()
+void clearBuffer()
 {
     while (Serial.available())
     {
@@ -13,9 +10,9 @@ void _clearBuffer()
     }
 }
 
-bool _waitForResponse()
+bool waitForResponse()
 {
-    long startWaitTime = millis();
+    unsigned long startWaitTime = millis();
     while (Serial.available() == 0)
     {
         if (millis() - startWaitTime > MAX_WAIT_TIME)
@@ -26,17 +23,17 @@ bool _waitForResponse()
     return true;
 }
 
-bool _send(int &command)
+bool send(int &command)
 {
     Serial.write(command);
-    if (!_waitForResponse())
+    if (!waitForResponse())
     {
         return false;
     }
     int echo = Serial.read();
     if (echo != command)
     {
-        _clearBuffer();
+        clearBuffer();
     }
 
     //echo should be same as sent command, if not, there communication problem.
@@ -45,19 +42,19 @@ bool _send(int &command)
 
 int getResponseFromAddr(int &address)
 {
-    if (!_send(address))
+    if (!send(address))
     {
-        _clearBuffer();
+        clearBuffer();
         return COMMUNICATION_COMM_ERR;
     }
-    if (_waitForResponse())
+    if (waitForResponse())
     {
         int readData = Serial.read();
         return readData;
     }
     else
     {
-        _clearBuffer();
+        clearBuffer();
         return COMMUNICATION_RESP_ERR;
     }
 }

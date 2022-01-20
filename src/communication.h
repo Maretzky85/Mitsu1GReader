@@ -4,11 +4,11 @@
 
 #define COMMUNICATION_COMM_ERR -1
 #define COMMUNICATION_RESP_ERR -2
-extern char COMM_ERR[9];
-extern char RESP_ERR[9];
+const char COMM_ERR[] PROGMEM = "Comm Err";
+const char RESP_ERR[] PROGMEM = "Resp Err";
 
-bool _waitForResponse();
+bool waitForResponse();
 
-bool _send(int &command);
+bool send(int &command);
 
 int getResponseFromAddr(int &address);

@@ -2,7 +2,6 @@
 #include <buttons.h>
 #include <commands.h>
 #include <lcd.h>
-#include <communication.h>
 #include <dataReader.h>
 #include <dtcReader.h>
 
