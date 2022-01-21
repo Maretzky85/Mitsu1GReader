@@ -29,3 +29,13 @@ void printResult(int result);
 void printDtcCount(int count);
 
 void clearScreen();
+
+//LCD 4 rows
+
+void printResult(char *result, int row);
+
+void printResultName(const char *name, int row);
+
+void printResultNames(const char *names[]);
+
+void printResults(char results[3][10]);

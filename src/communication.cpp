@@ -1,6 +1,18 @@
 #include <communication.h>
 
 const uint8_t MAX_WAIT_TIME = 50;
+uint8_t rps = 0;
+uint8_t receivedResponses = 0;
+unsigned long start = millis();
+
+void updateResponses() {
+    if (millis() - start > 1000) {
+        rps = receivedResponses;
+        receivedResponses = 0;
+        start = millis();
+    }
+    printRps(rps);
+}
 
 void clearBuffer() {
     while (Serial.available()) {
@@ -27,7 +39,7 @@ bool send(int &command) {
     if (echo != command) {
         clearBuffer();
     }
-
+    receivedResponses++;
     //echo should be same as sent command, if not, there communication problem.
     return echo == command;
 }

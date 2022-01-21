@@ -6,4 +6,4 @@
 #include <communication.h>
 #include <lcd.h>
 
-void readAndDisplayData();
+void dataReader();

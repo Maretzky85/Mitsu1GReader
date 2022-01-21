@@ -56,9 +56,10 @@ void updateState() {
 
 void loop() {
     updateState();
+    updateResponses();
     switch (currentState) {
         case DATA_READER:
-            readAndDisplayData();
+            dataReader();
             break;
         case DTC_READER:
             dtcReader();

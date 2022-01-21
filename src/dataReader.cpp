@@ -1,20 +1,10 @@
 #include <dataReader.h>
 
-unsigned long start = millis();
-int receivedResponses = 0;
-int requestPerSecond = 0;
+const char DATA_READER_HEADER[] PROGMEM = "DATA READER";
 
 int currentRequest = 0;
 
-bool error = false;
 
-void updateResponses() {
-    if (millis() - start > 1000) {
-        requestPerSecond = receivedResponses;
-        receivedResponses = 0;
-        start = millis();
-    }
-}
 
 void checkButtons() {
     if (buttonState == NEXT) {
@@ -31,26 +21,30 @@ void checkButtons() {
     }
 }
 
-void readAndDisplayData() {
-    checkButtons();
-    printHeader(requests[currentRequest].name);
-    printRps(requestPerSecond);
-    bool successSend = send(requests[currentRequest].addr);
-    if (!successSend) {
-        printError(COMM_ERR);
-        error = true;
-    }
-    if (waitForResponse()) {
-        int readData = Serial.read();
-        receivedResponses++;
-        if (!error) {
-            printResult(parseData(readData, &requests[currentRequest]));
-        } else {
-            error = false;
-            printResult(parseData(readData, &requests[currentRequest]), true);
-        }
-    } else if (!error) {
-        printError(RESP_ERR);
-    }
+char *readData(request *requestData) {
     updateResponses();
+    int response = getResponseFromAddr(requestData->addr);
+    if (response == COMMUNICATION_COMM_ERR || response == COMMUNICATION_RESP_ERR) {
+        return nullptr;
+    } else {
+        return parseData(response, requestData);
+    }
+}
+
+int getRequestNumberPlus(int addition) {
+    int nextR = currentRequest + addition;
+    if (nextR >= MAX_REQUESTS) {
+        nextR = nextR - MAX_REQUESTS;
+    }
+    return nextR;
+}
+
+void dataReader() {
+    printHeader(DATA_READER_HEADER);
+    checkButtons();
+    for (int i = 0; i < LCD_ROWS - 1; ++i) {
+        int requestId = getRequestNumberPlus(i);
+        printResultName(requests[requestId].name, i);
+        printResult(readData(&requests[requestId]), i);
+    }
 }

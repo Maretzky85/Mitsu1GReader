@@ -32,7 +32,7 @@ const char MILLISECONDS_NAME[] PROGMEM = "ms";
 const char HERTZ_NAME[] PROGMEM = "Hz";
 const char EMPTY_NAME[] PROGMEM = " ";
 const char KPA_NAME[] PROGMEM = "kPa";
-const char DEGREES_NAME[] PROGMEM = "deg";
+const char DEGREES_NAME[] PROGMEM = "C";
 
 enum parsers {
     P_RAW,
@@ -77,7 +77,7 @@ request requests[] = {
 const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
 char buffer[18] = "";
-const char parseFormat[] = "%4d%-3s";
+const char parseFormat[] = "%5d%-3s";
 const char parseFloatFormat[] = "%2d.%-2d%-3s";
 
 int convertToCelsius(double faren) {
@@ -114,7 +114,7 @@ void parseToTwelve(int &rawValue, char *unit) {
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
     float tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100); // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, parseFloatFormat, tmpInt1, tmpInt2, unit);
+    snprintf(buffer, 20 - 8, parseFloatFormat, tmpInt1, tmpInt2, unit);
 }
 
 void parseToPercent(int rawValue, char *unit) {
@@ -162,11 +162,11 @@ void parseBaro(int rawValue, char *unit) {
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
     double tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100);
-    sprintf(buffer, parseFloatFormat, tmpInt1, tmpInt2, unit);
+    snprintf(buffer, 20 - 8, parseFloatFormat, tmpInt1, tmpInt2, unit);
 }
 
 char *parseData(int &data, request *requestData) {
-    char unit[5];
+    char unit[4];
     strcpy_P(unit, requestData->unit);
     int parser = requestData->parser;
     switch (parser) {
