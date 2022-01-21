@@ -76,7 +76,9 @@ request requests[] = {
 
 const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
-char buffer[15] = "";
+char buffer[18] = "";
+const char parseFormat[] = "%4d%-3s";
+const char parseFloatFormat[] = "%2d.%-2d%-3s";
 
 int convertToCelsius(double faren) {
     return (faren - 32.0) * 5 / 9; // NOLINT(cppcoreguidelines-narrowing-conversions)
@@ -84,27 +86,27 @@ int convertToCelsius(double faren) {
 
 void parseISC(int rawValue, char *unit) {
     int result = 100 * rawValue / 120;
-    sprintf(buffer, "%7d %-6s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseEgrTEmp(int rawValue, char *unit) {
     int result = convertToCelsius(-2.7 * rawValue + 597); // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%7d %-6s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseAirTemp(int rawValue, char *unit) {
     int result = convertToCelsius(1.8 * rawValue + 32); // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%7d %-6s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseAirFlowHz(int rawValue, char *unit) {
     int result = 6.25 * rawValue; // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%8d %-5s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseTimingAdvance(int rawValue, char *unit) {
     int result = rawValue - 20;
-    sprintf(buffer, "%6d %-7s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseToTwelve(int &rawValue, char *unit) {
@@ -112,17 +114,17 @@ void parseToTwelve(int &rawValue, char *unit) {
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
     float tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100); // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
+    sprintf(buffer, parseFloatFormat, tmpInt1, tmpInt2, unit);
 }
 
 void parseToPercent(int rawValue, char *unit) {
     int result = 100 * rawValue / 255;
-    sprintf(buffer, "%7d %-6s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseFeedbackTrim(int rawValue, char *unit) {
     int result = (rawValue - 128) / 5;
-    sprintf(buffer, "%8d %-5s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseZeroOne(int rawValue, char *unit) {
@@ -130,17 +132,17 @@ void parseZeroOne(int rawValue, char *unit) {
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
     float tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100); // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
+    sprintf(buffer, parseFloatFormat, tmpInt1, tmpInt2, unit);
 }
 
 void parseRPM(int rawValue, char *unit) {
     int result = rawValue * 31.25; // NOLINT(cppcoreguidelines-narrowing-conversions)
-    sprintf(buffer, "%8d %-5s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseCoolant(int rawValue, char *unit) {
     int result = convertToCelsius(1.8 * rawValue + 32);
-    sprintf(buffer, "%8d %-5s", result, unit);
+    sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseInjPulse(int rawValue, char *unit) {
@@ -149,9 +151,9 @@ void parseInjPulse(int rawValue, char *unit) {
         char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
         float tmpFrac = result - tmpInt1;
         char tmpInt2 = trunc(tmpFrac * 100);
-        sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
+        sprintf(buffer, "%2d.%-2d%-3s", tmpInt1, tmpInt2, unit);
     } else {
-        sprintf(buffer, "%8d %-4s", 0, unit);
+        sprintf(buffer, parseFormat, 0, unit);
     }
 }
 
@@ -160,7 +162,7 @@ void parseBaro(int rawValue, char *unit) {
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
     double tmpFrac = result - tmpInt1;
     char tmpInt2 = trunc(tmpFrac * 100);
-    sprintf(buffer, "%6d.%-2d %-4s", tmpInt1, tmpInt2, unit);
+    sprintf(buffer, parseFloatFormat, tmpInt1, tmpInt2, unit);
 }
 
 char *parseData(int &data, request *requestData) {
@@ -169,7 +171,7 @@ char *parseData(int &data, request *requestData) {
     int parser = requestData->parser;
     switch (parser) {
         case P_RAW:
-            sprintf(buffer, "%4s%3d %-6s", "", data, unit);
+            sprintf(buffer, parseFormat, data, unit);
             break;
         case P_12V:
             parseToTwelve(data, unit);
