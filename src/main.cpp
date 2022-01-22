@@ -37,6 +37,7 @@ void setup() {
 void updateState() {
     updateButtonsState();
     if (buttonState == LONG_NEXT) {
+        redraw = true;
         currentState++;
         clearScreen();
         if (currentState == MAX_STATE) {
@@ -44,6 +45,7 @@ void updateState() {
         }
     }
     if (buttonState == LONG_PREVIOUS) {
+        redraw = true;
         clearScreen();
         if (currentState == 0) {
             currentState = sizeof(state) / sizeof(*state) - 1;
@@ -73,4 +75,5 @@ void loop() {
         default:
             break;
     }
+    redraw = false;
 }

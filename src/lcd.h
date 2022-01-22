@@ -8,6 +8,8 @@
 #define LCD_COLS 20
 #define LCD_ROWS 4
 
+extern bool redraw;
+
 void lcdStart();
 
 void printRps(int requestPerSecond);
@@ -30,7 +32,7 @@ void printDtcCount(int count);
 
 void clearScreen();
 
-void printStatus(const char *status); //TODO implement
+void printStatus(const char *status);
 //LCD 4 rows
 
 void printResult(char *result, int row, int rOffset = 0);
@@ -38,3 +40,5 @@ void printResult(char *result, int row, int rOffset = 0);
 void printResult(const char *result, int row);
 
 void printResultName(const char *name, int row);
+
+void printDTC(int dtcCode, const char *dtcName, int row);
