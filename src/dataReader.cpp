@@ -5,7 +5,6 @@ const char DATA_READER_HEADER[] PROGMEM = "DATA READER";
 int currentRequest = 0;
 
 
-
 void checkButtons() {
     if (buttonState == NEXT) {
         currentRequest++;

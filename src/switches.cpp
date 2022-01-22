@@ -53,6 +53,12 @@ void checkSwButtons() {
             current = 0;
         }
     }
+    if (buttonState == PREVIOUS) {
+        current--;
+        if (current == 0) {
+            current = switches_size - 1;
+        }
+    }
 }
 
 int getSwitchesNumberPlus(int addition) {
