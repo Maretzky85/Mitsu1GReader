@@ -33,10 +33,8 @@ void clearScreen();
 void printStatus(const char *status); //TODO implement
 //LCD 4 rows
 
-void printResult(char *result, int row);
+void printResult(char *result, int row, int rOffset = 0);
+
+void printResult(const char *result, int row);
 
 void printResultName(const char *name, int row);
-
-void printResultNames(const char *names[]);
-
-void printResults(char results[3][10]);

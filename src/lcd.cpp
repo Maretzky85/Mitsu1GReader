@@ -106,26 +106,20 @@ void printResultName(const char *name, int row) {
     }
 }
 
-void printResultNames(const char *names[]) {
-    for (int i = 0; i < 3; ++i) {
-        printResultName(names[i], i);
-    }
-}
-
-void printResult(char *result, int row) {
+void printResult(char *result, int row, int rOffset) {
     if (lastResults[row] != result) {
         lastResults[row] = result;
-        lcd.setCursor(LCD_COLS - 8, row + 1);
+        lcd.setCursor(LCD_COLS - 8 + rOffset, row + 1);
         lcd.print(result);
     }
 }
 
-void printResults(char results[3][10]) {
-    for (int i = 0; i < 3; ++i) {
-        if (results[i] != nullptr) {
-            printResult(results[i], i);
-        }
-    }
+void printResult(const char *result, int row) {
+    char temp[4];
+    char resBuffer[4];
+    strcpy_P(temp, result);
+    sprintf(resBuffer, "%3s", temp);
+    printResult(resBuffer, row, 3);
 }
 
 void printResult(int result) {
@@ -162,7 +156,7 @@ void printDtcCount(int count) {
 void printStatus(const char *status){
     if (lastPrintedStatus != status) {
         char buffer[3];
-        lcd.setCursor(LCD_COLS - 5, 0);
+        lcd.setCursor(LCD_COLS - 4, 0);
         strcpy_P(buffer, status);
         lcd.print(buffer);
         lastPrintedStatus = status;
