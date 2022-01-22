@@ -56,7 +56,7 @@ void updateState() {
 
 void loop() {
     updateState();
-    updateResponses();
+    updateStatus();
     switch (currentState) {
         case DATA_READER:
             dataReader();

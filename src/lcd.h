@@ -30,6 +30,7 @@ void printDtcCount(int count);
 
 void clearScreen();
 
+void printStatus(const char *status); //TODO implement
 //LCD 4 rows
 
 void printResult(char *result, int row);

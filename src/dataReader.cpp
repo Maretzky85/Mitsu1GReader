@@ -22,9 +22,8 @@ void checkButtons() {
 }
 
 char *readData(request *requestData) {
-    updateResponses();
     int response = getResponseFromAddr(requestData->addr);
-    if (response == COMMUNICATION_COMM_ERR || response == COMMUNICATION_RESP_ERR) {
+    if (response == COMM_ERR) {
         return nullptr;
     } else {
         return parseData(response, requestData);
@@ -46,5 +45,6 @@ void dataReader() {
         int requestId = getRequestNumberPlus(i);
         printResultName(requests[requestId].name, i);
         printResult(readData(&requests[requestId]), i);
+        delay(1); //without delay leads to too fast next request causes read error
     }
 }

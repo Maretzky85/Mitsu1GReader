@@ -1,16 +1,23 @@
 #include <communication.h>
+//STATUS
+const char STATUS_OK[] PROGMEM = "OK";
+const char STATUS_ERR_COMM[] PROGMEM = "!C";
+const char STATUS_ERR_RESP[] PROGMEM = "!R";
+
+const char *communicationStatus = nullptr;
 
 const uint8_t MAX_WAIT_TIME = 50;
 uint8_t rps = 0;
 uint8_t receivedResponses = 0;
 unsigned long start = millis();
 
-void updateResponses() {
+void updateStatus() {
     if (millis() - start > 1000) {
         rps = receivedResponses;
         receivedResponses = 0;
         start = millis();
     }
+    printStatus(communicationStatus);
     printRps(rps);
 }
 
@@ -33,29 +40,32 @@ bool waitForResponse() {
 bool send(int &command) {
     Serial.write(command);
     if (!waitForResponse()) {
+        communicationStatus = STATUS_ERR_COMM;
         return false;
     }
     int echo = Serial.read();
     if (echo != command) {
+        communicationStatus = STATUS_ERR_COMM;
         clearBuffer();
     }
-    receivedResponses++;
+    communicationStatus = STATUS_OK;
     //echo should be same as sent command, if not, there communication problem.
     return echo == command;
 }
 
-//TODO return int8_t
 int getResponseFromAddr(int &address) {
     if (!send(address)) {
         clearBuffer();
-        return COMMUNICATION_COMM_ERR;
+        return COMM_ERR;
     }
     if (waitForResponse()) {
         int readData = Serial.read();
+        receivedResponses++;
         return readData;
     } else {
+        communicationStatus = STATUS_ERR_RESP;
         clearBuffer();
-        return COMMUNICATION_RESP_ERR;
+        return COMM_ERR;
     }
 }
 

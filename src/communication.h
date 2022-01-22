@@ -3,12 +3,11 @@
 #include <Arduino.h>
 #include <lcd.h>
 
-#define COMMUNICATION_COMM_ERR -1
-#define COMMUNICATION_RESP_ERR -2
-const char COMM_ERR[] PROGMEM = "Comm Err";
-const char RESP_ERR[] PROGMEM = "Resp Err";
+const int COMM_ERR = -1;
 
-void updateResponses();
+extern const char *communicationStatus;
+
+void updateStatus();
 
 int getResponseFromAddr(int &address);
 

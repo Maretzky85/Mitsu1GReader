@@ -119,15 +119,9 @@ void readDtc() {
     int lowByte = getResponseFromAddr(stored_low);
     delay(1);
     int highByte = getResponseFromAddr(stored_high);
-    if (lowByte == COMMUNICATION_COMM_ERR || highByte == COMMUNICATION_COMM_ERR) {
-        printError(COMM_ERR);
+    if (lowByte == COMM_ERR || highByte == COMM_ERR) {
         return;
     }
-    if (lowByte == COMMUNICATION_RESP_ERR || highByte == COMMUNICATION_RESP_ERR) {
-        printError(RESP_ERR);
-        return;
-    }
-
     unsigned int word = highByte * 256 + lowByte;
     updateDTCState(word);
 

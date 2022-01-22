@@ -22,6 +22,7 @@ char temp[LCD_COLS - 1];
 char headerFormat[6];
 
 //display optimisation - dont print if same
+const char *lastPrintedStatus = nullptr;
 const char *lastPrintedHeader = nullptr;
 const char *lastPrintedResultsName[] = {
         nullptr,
@@ -156,6 +157,16 @@ void printDtcCount(int count) {
     lcd.setCursor(14, 1);
     lcd.print(count);
     lcd.print(' ');
+}
+
+void printStatus(const char *status){
+    if (lastPrintedStatus != status) {
+        char buffer[3];
+        lcd.setCursor(LCD_COLS - 5, 0);
+        strcpy_P(buffer, status);
+        lcd.print(buffer);
+        lastPrintedStatus = status;
+    }
 }
 
 void clearScreen() {

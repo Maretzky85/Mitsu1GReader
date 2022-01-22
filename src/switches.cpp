@@ -60,15 +60,8 @@ bool parseWithMask(const uint8_t &rawValue, const int &mask) {
 void run_switches_routine() {
     checkSwButtons();
     printHeader(switches[current].name);
-    //TODO move checks to communication as function returning bool
     int result = getResponseFromAddr(switches[current].address);
-    if (result == COMMUNICATION_COMM_ERR) {
-        printResult_P(COMM_ERR);
-        return;
-    }
-    //TODO move checks to communication as function returning bool
-    if (result == COMMUNICATION_RESP_ERR) {
-        printResult_P(RESP_ERR);
+    if (result == COMM_ERR) {
         return;
     }
     if (parseWithMask(result, switches[current].mask)) {
