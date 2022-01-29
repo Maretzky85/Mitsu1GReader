@@ -14,7 +14,7 @@ bool nextButtonPressed = false;
 buttons checkButtonsInput() {
     int prevButtonState = digitalRead(prevButtonPin);
 
-    if (prevButtonState == LOW && prevButtonPressed) {
+    if (prevButtonState == HIGH && prevButtonPressed) {
         prevButtonPressed = false;
         if (millis() - prevButtonPressedTime > longPressTime) {
             return LONG_PREVIOUS;
@@ -22,14 +22,14 @@ buttons checkButtonsInput() {
         return PREVIOUS;
     }
 
-    if (prevButtonState == HIGH && !prevButtonPressed) {
+    if (prevButtonState == LOW && !prevButtonPressed) {
         prevButtonPressed = true;
         prevButtonPressedTime = millis();
     }
 
     int nextButtonState = digitalRead(nextButtonPin);
 
-    if (nextButtonState == LOW && nextButtonPressed) {
+    if (nextButtonState == HIGH && nextButtonPressed) {
         nextButtonPressed = false;
         if (millis() - nextButtonPressedTime > longPressTime) {
             return LONG_NEXT;
@@ -37,7 +37,7 @@ buttons checkButtonsInput() {
         return NEXT;
     }
 
-    if (nextButtonState == HIGH && !nextButtonPressed) {
+    if (nextButtonState == LOW && !nextButtonPressed) {
         nextButtonPressed = true;
         nextButtonPressedTime = millis();
     }

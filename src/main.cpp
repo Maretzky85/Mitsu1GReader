@@ -29,8 +29,8 @@ void setup() {
     lcdStart();
     printHeader(WELCOME);
     delay(500);
-    pinMode(prevButtonPin, INPUT);
-    pinMode(nextButtonPin, INPUT);
+    pinMode(prevButtonPin, INPUT_PULLUP);
+    pinMode(nextButtonPin, INPUT_PULLUP);
     Serial.begin(2000);
 }
 
