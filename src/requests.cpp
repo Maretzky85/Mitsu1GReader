@@ -147,9 +147,9 @@ void parseCoolant(int rawValue, char *unit) {
 
 void parseInjPulse(int rawValue, char *unit) {
     if (rawValue != 0) {
-        float result = rawValue / 1000; // NOLINT(bugprone-integer-division)
+        double result = rawValue * 0.256;
         char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
-        float tmpFrac = result - tmpInt1;
+        double tmpFrac = result - tmpInt1;
         char tmpInt2 = trunc(tmpFrac * 100);
         sprintf(buffer, "%2d.%-2d%-3s", tmpInt1, tmpInt2, unit);
     } else {
