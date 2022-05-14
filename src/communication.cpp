@@ -21,52 +21,30 @@ void updateStatus() {
     printRps(rps);
 }
 
-void clearBuffer() {
-    while (Serial.available()) {
-        Serial.read();
-    }
-}
-
-bool waitForResponse() {
-    unsigned long startWaitTime = millis();
-    while (Serial.available() == 0) {
-        if (millis() - startWaitTime > MAX_WAIT_TIME) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool send(int &command) {
-    Serial.write(command);
-    if (!waitForResponse()) {
-        communicationStatus = STATUS_ERR_COMM;
-        return false;
-    }
-    int echo = Serial.read();
-    if (echo != command) {
-        communicationStatus = STATUS_ERR_COMM;
-        clearBuffer();
-    }
-    communicationStatus = STATUS_OK;
-    //echo should be same as sent command, if not, there communication problem.
-    return echo == command;
-}
 
 int getResponseFromAddr(int &address) {
-    if (!send(address)) {
-        clearBuffer();
-        return COMM_ERR;
+    Serial.write(address);
+    unsigned long startWaitTime = millis();
+    while (Serial.available() != 2) {
+        if (millis() - startWaitTime > MAX_WAIT_TIME) {
+            if (Serial.available() > 0) {
+                Serial.flush();
+            }
+            communicationStatus = STATUS_ERR_COMM;
+            return COMM_ERR;
+        }
     }
-    if (waitForResponse()) {
-        int readData = Serial.read();
-        receivedResponses++;
-        return readData;
-    } else {
+    int echo = Serial.read();
+    int response = Serial.read();
+
+    if (echo != address) {
         communicationStatus = STATUS_ERR_RESP;
-        clearBuffer();
+        Serial.flush();
         return COMM_ERR;
     }
+    receivedResponses++;
+    communicationStatus = STATUS_OK;
+    return response;
 }
 
 int getResponseFromAddr(const uint8_t *address) {

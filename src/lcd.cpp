@@ -40,24 +40,11 @@ String lastResults[] = {
 int lastRpsPrinted = 0;
 int lastDTCIdPrinted = 0;
 
-//const byte star[] PROGMEM = {
-//        B00100,
-//        B00100,
-//        B10001,
-//        B01010,
-//        B00100,
-//        B01010,
-//        B10101,
-//        B00100
-//};
-
 void lcdStart() {
     sprintf(headerFormat, "%s%d%s", "%-", LCD_COLS - 4, "s");
     sprintf(resultFormat, "%s%d%s", "%-", LCD_COLS - 5, "s");
     lcd.begin(LCD_COLS, LCD_ROWS);
     lcd.backlight();
-//    lcd.createChar(0, star);
-//    lcd.write(0);
 }
 
 void printRps(int requestPerSecond) {
@@ -131,15 +118,6 @@ void printResult(int result) {
 void printResult_P(const char *result) {
     strcpy_P(temp, result);
     printResult(temp);
-}
-
-void printDTC(int dtcCode, char dtcName[]) {
-    if (lastDTCIdPrinted != dtcCode || redraw) {
-        sprintf(resultBuffer0, "%2d - %-8s", dtcCode, dtcName);
-        lastDTCIdPrinted = dtcCode;
-        lcd.setCursor(0, 1);
-    }
-    printResult(resultBuffer0);
 }
 
 void printDTC(int dtcCode, const char *dtcName, int row) {

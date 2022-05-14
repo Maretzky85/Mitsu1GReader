@@ -12,7 +12,16 @@ const char AC_SWITCH_NAME[] PROGMEM = "AC switch";
 const char AC_CLUTCH_NAME[] PROGMEM = "AC clutch";
 const char PN_SWITCH_NAME[] PROGMEM = "Park / N";
 const char IDLE_SWITCH_NAME[] PROGMEM = "Idle sw";
-const char UNKNOWN_NAME[] PROGMEM = "UNK";
+const char UNKNOWN_NAME[] PROGMEM = "UNK0";
+const char UNKNOWN_NAME1[] PROGMEM = "UNK1";
+const char UNKNOWN_NAME2[] PROGMEM = "UNK2";
+const char UNKNOWN_NAME3[] PROGMEM = "UNK3";
+const char UNKNOWN_NAME4[] PROGMEM = "UNK4";
+const char UNKNOWN_NAME5[] PROGMEM = "UNK5";
+const char UNKNOWN_NAME6[] PROGMEM = "UNK6";
+const char UNKNOWN_NAME7[] PROGMEM = "UNK7";
+const char UNKNOWN_NAME8[] PROGMEM = "UNK8";
+const char UNKNOWN_NAME9[] PROGMEM = "UNK9";
 
 //STATES
 const char ON_NAME[] PROGMEM = "ON";
@@ -25,22 +34,22 @@ struct sSwitch {
 };
 
 const sSwitch switches[] = {
-        {&FIRST,  0x00, UNKNOWN_NAME},
-        {&FIRST,  0x02, UNKNOWN_NAME},
-        {&FIRST,  0x04, UNKNOWN_NAME},
-        {&FIRST,  0x08, UNKNOWN_NAME},
-        {&FIRST,  0x10, UNKNOWN_NAME},
-        {&FIRST,  0x20, AC_CLUTCH_NAME},
-        {&FIRST,  0x40, UNKNOWN_NAME},
-        {&FIRST,  0x80, UNKNOWN_NAME},
         {&SECOND, 0x00, UNKNOWN_NAME},
-        {&SECOND, 0x02, UNKNOWN_NAME},
+        {&SECOND, 0x02, UNKNOWN_NAME1},
         {&SECOND, 0x04, TOP_DEAD_CENTER_NAME},
         {&SECOND, 0x08, POWER_STEERING_NAME},
         {&SECOND, 0x10, AC_SWITCH_NAME},
         {&SECOND, 0x20, PN_SWITCH_NAME},
-        {&SECOND, 0x40, UNKNOWN_NAME},
+        {&SECOND, 0x40, UNKNOWN_NAME2},
         {&SECOND, 0x80, IDLE_SWITCH_NAME},
+        {&FIRST,  0x00, UNKNOWN_NAME3},
+        {&FIRST,  0x02, UNKNOWN_NAME4},
+        {&FIRST,  0x04, UNKNOWN_NAME5},
+        {&FIRST,  0x08, UNKNOWN_NAME6},
+        {&FIRST,  0x10, UNKNOWN_NAME7},
+        {&FIRST,  0x20, AC_CLUTCH_NAME},
+        {&FIRST,  0x40, UNKNOWN_NAME8},
+        {&FIRST,  0x80, UNKNOWN_NAME9},
 };
 
 const uint8_t switches_size = sizeof(switches) / sizeof(*switches);
