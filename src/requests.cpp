@@ -80,22 +80,18 @@ char buffer[18] = "";
 const char parseFormat[] = "%5d%-3s";
 const char parseFloatFormat[] = "%2d.%-2d%-3s";
 
-int convertToCelsius(double faren) {
-    return (faren - 32.0) * 5 / 9; // NOLINT(cppcoreguidelines-narrowing-conversions)
-}
-
 void parseISC(int rawValue, char *unit) {
     int result = 100 * rawValue / 120;
     sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseEgrTEmp(int rawValue, char *unit) {
-    int result = convertToCelsius(-2.7 * rawValue + 597); // NOLINT(cppcoreguidelines-narrowing-conversions)
+    int result = -0.792 * rawValue + 313; // NOLINT(cppcoreguidelines-narrowing-conversions)
     sprintf(buffer, parseFormat, result, unit);
 }
 
 void parseAirTemp(int rawValue, char *unit) {
-    int result = convertToCelsius(1.8 * rawValue + 32); // NOLINT(cppcoreguidelines-narrowing-conversions)
+    int result = -0.945 * rawValue + 184; // NOLINT(cppcoreguidelines-narrowing-conversions)
     sprintf(buffer, parseFormat, result, unit);
 }
 
@@ -105,7 +101,7 @@ void parseAirFlowHz(int rawValue, char *unit) {
 }
 
 void parseTimingAdvance(int rawValue, char *unit) {
-    int result = rawValue - 20;
+    int result = rawValue - 10;
     sprintf(buffer, parseFormat, result, unit);
 }
 
@@ -141,7 +137,7 @@ void parseRPM(int rawValue, char *unit) {
 }
 
 void parseCoolant(int rawValue, char *unit) {
-    int result = convertToCelsius(1.8 * rawValue + 32);
+    int result = -0.792 * rawValue + 156;
     sprintf(buffer, parseFormat, result, unit);
 }
 
