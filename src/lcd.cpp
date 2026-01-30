@@ -31,12 +31,8 @@ const char *lastPrintedResultsName[] = {
         nullptr,
         nullptr
 };
-String lastResultPrinted = "";
-String lastResults[] = {
-        "",
-        "",
-        ""
-};
+char lastResultPrinted[LCD_COLS] = "";
+char lastResults[3][LCD_COLS] = {"", "", ""};
 int lastRpsPrinted = 0;
 int lastDTCIdPrinted = 0;
 
@@ -89,8 +85,9 @@ void printHeader(const char *header) {
 }
 
 void printResult(char *result, boolean force) {
-    if (lastResultPrinted != result || force || redraw) {
-        lastResultPrinted = result;
+    if (strcmp(lastResultPrinted, result) != 0 || force || redraw) {
+        strncpy(lastResultPrinted, result, sizeof(lastResultPrinted) - 1);
+        lastResultPrinted[sizeof(lastResultPrinted) - 1] = '\0';
         sprintf(resultBuffer0, resultFormat, result);
         lcd.setCursor(0, 1);
         lcd.print(resultBuffer0);
@@ -108,8 +105,9 @@ void printResultName(const char *name, int row) {
 }
 
 void printResult(char *result, int row, int rOffset) {
-    if (lastResults[row] != result || redraw) {
-        lastResults[row] = result;
+    if (strcmp(lastResults[row], result) != 0 || redraw) {
+        strncpy(lastResults[row], result, sizeof(lastResults[row]) - 1);
+        lastResults[row][sizeof(lastResults[row]) - 1] = '\0';
         lcd.setCursor(LCD_COLS - 8 + rOffset, row + 1);
         lcd.print(result);
     }
