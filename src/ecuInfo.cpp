@@ -83,7 +83,7 @@ void showEcuInfo() {
 
     char msg[LCD_COLS + 1];
     strcpy_P(msg, PROBING);
-    printResult(msg, 1);
+    printResult(msg, 0);
 
     while (Serial.available()) Serial.read();
     delay(50);
@@ -97,7 +97,7 @@ void showEcuInfo() {
 
     if (romId == COMM_ERR || strapA == COMM_ERR || strapB == COMM_ERR) {
         strcpy_P(msg, NO_RESPONSE);
-        printResult(msg, 1);
+        printResult(msg, 0);
         delay(3000);
         return;
     }
@@ -113,13 +113,13 @@ void showEcuInfo() {
     } else {
         snprintf(line, sizeof(line), "ROM: $%02X unknown", romId);
     }
-    printResult(line, 1);
+    printResult(line, 0);
 
     // Line 2: raw strap word display
     uint16_t strap_be = ((uint16_t) strapA << 8) | (uint16_t) strapB;
     uint16_t strap_le = ((uint16_t) strapB << 8) | (uint16_t) strapA;
     snprintf(line, sizeof(line), "Straps: $%02X%02X", strapA, strapB);
-    printResult(line, 2);
+    printResult(line, 1);
 
     // Line 3: slot match against the identified ROM's table
     if (idx >= 0) {
@@ -132,7 +132,7 @@ void showEcuInfo() {
     } else {
         snprintf(line, sizeof(line), "Slot: -- (ROM new)");
     }
-    printResult(line, 3);
+    printResult(line, 2);
 
     delay(3000);
 }

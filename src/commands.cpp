@@ -55,10 +55,10 @@ command commands[] = {
         {INJ6,  INJECTOR_SIX_NAME},    // no-op on 4-cyl
         {FP,    FUEL_PUMP_RELAY_NAME},
         {PURGE, PURGE_RELAY_NAME},
-        {U1,    BOOST_SOLENOID_NAME},
-        {U2,    EGR_SOLENOID_NAME},
-        {U3,    UNUSED_BIT_NAME},
-        {U4,    FPS_SOLENOID_NAME},
+        {U1,    FPS_SOLENOID_NAME},    // U1 = $F4 -> mask $04 -> FPS
+        {U2,    EGR_SOLENOID_NAME},    // U2 = $F3 -> mask $08 -> EGR
+        {U3,    UNUSED_BIT_NAME},      // U3 = $F2 -> mask $10 -> dead in E931
+        {U4,    BOOST_SOLENOID_NAME},  // U4 = $F1 -> mask $20 -> boost/wastegate
 };
 
 int commands_length = sizeof(commands) / sizeof(*commands);
