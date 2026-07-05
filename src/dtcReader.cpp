@@ -98,7 +98,9 @@ void printFirstError() {
     printDTC(firstError.code, firstError.name, 0);
     printResultName(DTC_EMPTY, 1);
     printResultName(DTC_EMPTY, 2);
-    printResultName(DTC_EMPTY, 3);
+    // No row 3 -- LCD dedup arrays are size 3 (indices 0..2).
+    // Writing row 3 corrupted lastPrintedResultsName[3]/resultBuffers[3],
+    // which trashed globals used by other screens.
 }
 
 void printErrorIndex(int index) {
@@ -132,7 +134,7 @@ void displayDtcResults() {
         printResult_P(NO_ERRORS);
         printResultName(DTC_EMPTY, 1);
         printResultName(DTC_EMPTY, 2);
-        printResultName(DTC_EMPTY, 3);
+        // No row 3 -- see note in printFirstError().
         return;
     }
 

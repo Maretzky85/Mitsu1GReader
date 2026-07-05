@@ -31,14 +31,10 @@ const char *lastPrintedResultsName[] = {
         nullptr,
         nullptr
 };
-String lastResultPrinted = "";
-String lastResults[] = {
-        "",
-        "",
-        ""
-};
-int lastRpsPrinted = 0;
-int lastDTCIdPrinted = 0;
+char lastResultPrinted[LCD_COLS] = "";
+char lastResults[3][LCD_COLS] = {"", "", ""};
+int lastRpsPrinted = -1;
+int lastDTCIdPrinted = -1;
 
 //const byte star[] PROGMEM = {
 //        B00100,
@@ -89,8 +85,9 @@ void printHeader(const char *header) {
 }
 
 void printResult(char *result, boolean force) {
-    if (lastResultPrinted != result || force || redraw) {
-        lastResultPrinted = result;
+    if (strcmp(lastResultPrinted, result) != 0 || force || redraw) {
+        strncpy(lastResultPrinted, result, sizeof(lastResultPrinted) - 1);
+        lastResultPrinted[sizeof(lastResultPrinted) - 1] = '\0';
         sprintf(resultBuffer0, resultFormat, result);
         lcd.setCursor(0, 1);
         lcd.print(resultBuffer0);
@@ -108,8 +105,9 @@ void printResultName(const char *name, int row) {
 }
 
 void printResult(char *result, int row, int rOffset) {
-    if (lastResults[row] != result || redraw) {
-        lastResults[row] = result;
+    if (strcmp(lastResults[row], result) != 0 || redraw) {
+        strncpy(lastResults[row], result, sizeof(lastResults[row]) - 1);
+        lastResults[row][sizeof(lastResults[row]) - 1] = '\0';
         lcd.setCursor(LCD_COLS - 8 + rOffset, row + 1);
         lcd.print(result);
     }
@@ -129,8 +127,19 @@ void printResult(int result) {
 }
 
 void printFullRow(int row, const char *text) {
+    // Manual pad — avr-libc's minimal printf (default in some builds) does
+    // not support the '*' width specifier, so "%-*s" silently produces an
+    // empty string. Build the padded buffer by hand instead.
     char buf[LCD_COLS + 1];
-    snprintf(buf, sizeof(buf), "%-*s", LCD_COLS, text);
+    uint8_t i = 0;
+    while (i < LCD_COLS && text[i]) {
+        buf[i] = text[i];
+        i++;
+    }
+    while (i < LCD_COLS) {
+        buf[i++] = ' ';
+    }
+    buf[LCD_COLS] = '\0';
     lcd.setCursor(0, row);
     lcd.print(buf);
 }
@@ -185,4 +194,16 @@ void printStatus(const char *status){
 
 void clearScreen() {
     lcd.clear();
+    // Invalidate all dedup state: after lcd.clear() the screen is blank, so
+    // the "last printed" caches no longer match what's on the display and
+    // any next print of the same content would be wrongly skipped.
+    lastPrintedHeader = nullptr;
+    lastPrintedStatus = nullptr;
+    for (uint8_t i = 0; i < 3; i++) {
+        lastPrintedResultsName[i] = nullptr;
+        lastResults[i][0] = '\0';
+    }
+    lastResultPrinted[0] = '\0';
+    lastRpsPrinted = -1;
+    lastDTCIdPrinted = -1;
 }
