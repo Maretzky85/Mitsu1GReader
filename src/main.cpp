@@ -5,6 +5,7 @@
 #include <lcd.h>
 #include <dataReader.h>
 #include <dtcReader.h>
+#include <ecuInfo.h>
 #include <switches.h>
 
 #define DATA_READER 0
@@ -32,6 +33,7 @@ void setup() {
     pinMode(prevButtonPin, INPUT_PULLUP);
     pinMode(nextButtonPin, INPUT_PULLUP);
     Serial.begin(1953);
+    showEcuInfo();
 }
 
 void updateState() {
