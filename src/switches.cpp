@@ -82,7 +82,7 @@ void run_switches_routine() {
         printResultName(switches[switchId].name, i);
         int result = getResponseFromAddr(switches[switchId].address);
         if (result == COMM_ERR) {
-            return;
+            continue;  // skip value, keep drawing remaining rows
         }
         parseWithMask(result, switches[switchId].mask)
         ? printResult(ON_NAME, i)
