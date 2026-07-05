@@ -24,7 +24,11 @@ const int DTC_CLEAR = 1;
 
 int current_state = DTC_READ;
 
-int clearErrorsList[] = {0xCA, 0x7E, 0xFA, 0xFC};
+// $CA is the sole fault-clear command per ROM L7106-7118.
+// The prior list also contained $7E (harmless RAM peek at $007E) and $FA/$FC
+// (injector-3 and injector-1 kill), which the ECU will act on if it happens to
+// be not-rotating at the moment of the request. Send only $CA.
+int clearErrorsList[] = {0xCA};
 
 int stored_low = 0x3B;
 int stored_high = 0x3C;

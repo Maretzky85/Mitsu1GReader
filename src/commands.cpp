@@ -10,10 +10,10 @@ const char INJECTOR_FIVE_NAME[] PROGMEM = "Injector 5";
 const char INJECTOR_SIX_NAME[] PROGMEM = "Injector 6";
 const char FUEL_PUMP_RELAY_NAME[] PROGMEM = "Fuel Pump R";
 const char PURGE_RELAY_NAME[] PROGMEM = "Purge";
-const char UNKNOWN_ONE_NAME[] PROGMEM = "UNK 1";
-const char UNKNOWN_TWO_NAME[] PROGMEM = "UNK 2";
-const char UNKNOWN_THREE_NAME[] PROGMEM = "UNK 3";
-const char UNKNOWN_FOUR_NAME[] PROGMEM = "UNK 4";
+const char FPS_SOLENOID_NAME[] PROGMEM = "Fuel Pres";
+const char EGR_SOLENOID_NAME[] PROGMEM = "EGR Sol";
+const char UNUSED_BIT_NAME[] PROGMEM = "Unused$10";
+const char BOOST_SOLENOID_NAME[] PROGMEM = "Boost Sol";
 
 int currentCommand = 0;
 
@@ -37,19 +37,28 @@ enum command_address {
     INJ1 = 0xFC
 };
 
+// MH6111 actuator masks (from t_obdActMask in ROM: 20 10 08 04 01 02):
+//   $F1 mask $20 -> boost/wastegate solenoid      (ROM L4860)
+//   $F2 mask $10 -> unused in E931 (no brset ref) -- may be live in other family ROMs
+//   $F3 mask $08 -> EGR solenoid                  (ROM L4782)
+//   $F4 mask $04 -> fuel pressure solenoid (FPS)  (ROM L4943 header, L4954)
+//   $F5 mask $01 -> purge solenoid                (ROM L4647)
+//   $F6 mask $02 -> fuel pump relay               (ROM L4542)
+// Injector kill ($F7-$FC): $F7/$F8 are silently ignored by the ECU (4-cyl -> no inj 5/6);
+// $F9-$FC kill injectors 4/3/2/1 in that order (ROM L7199-7207).
 command commands[] = {
         {INJ1,  INJECTOR_ONE_NAME},
         {INJ2,  INJECTOR_TWO_NAME},
         {INJ3,  INJECTOR_THREE_NAME},
         {INJ4,  INJECTOR_FOUR_NAME},
-        {INJ5,  INJECTOR_FIVE_NAME},
-        {INJ6,  INJECTOR_SIX_NAME},
+        {INJ5,  INJECTOR_FIVE_NAME},   // no-op on 4-cyl (ECU silently discards)
+        {INJ6,  INJECTOR_SIX_NAME},    // no-op on 4-cyl
         {FP,    FUEL_PUMP_RELAY_NAME},
         {PURGE, PURGE_RELAY_NAME},
-        {U1,    UNKNOWN_ONE_NAME},
-        {U2,    UNKNOWN_TWO_NAME},
-        {U3,    UNKNOWN_THREE_NAME},
-        {U4,    UNKNOWN_FOUR_NAME},
+        {U1,    BOOST_SOLENOID_NAME},
+        {U2,    EGR_SOLENOID_NAME},
+        {U3,    UNUSED_BIT_NAME},
+        {U4,    FPS_SOLENOID_NAME},
 };
 
 int commands_length = sizeof(commands) / sizeof(*commands);
