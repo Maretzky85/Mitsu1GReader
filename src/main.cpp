@@ -31,7 +31,7 @@ void setup() {
     delay(500);
     pinMode(prevButtonPin, INPUT_PULLUP);
     pinMode(nextButtonPin, INPUT_PULLUP);
-    Serial.begin(2000);
+    Serial.begin(1953);
 }
 
 void updateState() {

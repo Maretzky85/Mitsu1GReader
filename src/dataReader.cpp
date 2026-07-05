@@ -24,9 +24,18 @@ char *readData(request *requestData) {
     int response = getResponseFromAddr(requestData->addr);
     if (response == COMM_ERR) {
         return nullptr;
-    } else {
-        return parseData(response, requestData);
     }
+    // 16-bit reads (e.g. injPw at $29:$2A) fetch the low byte from addr+1
+    // and pack the pair into one int as (high<<8)|low.
+    if (requestData->parser == P_INJ_PULSE_16) {
+        int lowAddr = requestData->addr + 1;
+        int lowByte = getResponseFromAddr(lowAddr);
+        if (lowByte == COMM_ERR) {
+            return nullptr;
+        }
+        response = ((response & 0xFF) << 8) | (lowByte & 0xFF);
+    }
+    return parseData(response, requestData);
 }
 
 int getRequestNumberPlus(int addition) {
