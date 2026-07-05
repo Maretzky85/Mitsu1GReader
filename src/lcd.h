@@ -39,6 +39,11 @@ void printResult(char *result, int row, int rOffset = 0);
 
 void printResult(const char *result, int row);
 
+// Write text at column 0 of the given LCD row (0-indexed), padded/clipped
+// to LCD_COLS. Bypasses the dedup buffers used by printResult() and
+// printResultName() so it's safe for arbitrary rows including the header.
+void printFullRow(int row, const char *text);
+
 void printResultName(const char *name, int row);
 
 void printDTC(int dtcCode, const char *dtcName, int row);

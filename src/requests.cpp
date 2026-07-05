@@ -23,6 +23,7 @@ const char EGR_TEMPERATURE_NAME[] PROGMEM = "Egr Temp";
 const char OCTANE_NAME[] PROGMEM = "Octane";
 const char KNOCK_DECAY_NAME[] PROGMEM = "Knock Dcy";
 const char CLOSED_LOOP_NAME[] PROGMEM = "CL Flags";
+const char ENGINE_STATE_NAME[] PROGMEM = "Eng State";
 
 // UNITS
 const char VOLTS_NAME[] PROGMEM = "V";
@@ -103,7 +104,8 @@ request requests[] = {
         // Direct RAM peek entries (obdCode >= $40) -- see requests.h.
         {OCTANE,               P_RAW,            OCTANE_NAME,                 EMPTY_NAME},
         {KNOCK_DECAY_TIMER,    P_RAW,            KNOCK_DECAY_NAME,            EMPTY_NAME},
-        {CLOSED_LOOP_FLAGS,    P_CL_FLAGS,       CLOSED_LOOP_NAME,            EMPTY_NAME}};
+        {CLOSED_LOOP_FLAGS,    P_CL_FLAGS,       CLOSED_LOOP_NAME,            EMPTY_NAME},
+        {ENGINE_STATE1,        P_STATE1,         ENGINE_STATE_NAME,           EMPTY_NAME}};
 
 const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
@@ -186,6 +188,23 @@ void parseInjPulse16(int rawValue, char *unit) {
     }
 }
 
+// Decode state1 ($1E) into a 6-char status string.
+// Format: "<eng> <loop>" where eng is 3-char engine-state code and loop
+// is "CL" or "OL". Engine state uses priority order because multiple bits
+// can be set simultaneously.
+void parseState1(int rawValue, char *unit) {
+    (void) unit;
+    const char *eng;
+    if      (rawValue & 0x10) eng = "OFF";   // notRotating
+    else if (rawValue & 0x08) eng = "cut";   // rotatingStopInj (fuel cut / CAS fault)
+    else if (rawValue & 0x04) eng = "rev";   // runningFast (over-rev / rev limit)
+    else if (rawValue & 0x01) eng = "cnk";   // startingToCrank
+    else if (rawValue & 0x02) eng = "cas";   // no pulse-accumulator ints (CAS)
+    else                      eng = "run";   // normal running
+    const char *loop = (rawValue & 0x80) ? "CL" : "OL";
+    sprintf(buffer, "%s %s", eng, loop);
+}
+
 // Decode closedLpFlags ($E8) bits into a 7-char status string.
 // Bit 7 rich/lean, bit 6 o2 sensor bad, bit 1 closed-loop conditions met,
 // bit 0 airflow above closed-loop threshold. Priority order applies to
@@ -261,6 +280,9 @@ char *parseData(int &data, request *requestData) {
             break;
         case P_CL_FLAGS:
             parseClFlags(data, unit);
+            break;
+        case P_STATE1:
+            parseState1(data, unit);
             break;
         default:
             sprintf(buffer, "%11s%3d", "", data);

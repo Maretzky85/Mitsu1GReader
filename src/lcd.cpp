@@ -128,6 +128,13 @@ void printResult(int result) {
     printResult(temp);
 }
 
+void printFullRow(int row, const char *text) {
+    char buf[LCD_COLS + 1];
+    snprintf(buf, sizeof(buf), "%-*s", LCD_COLS, text);
+    lcd.setCursor(0, row);
+    lcd.print(buf);
+}
+
 void printResult_P(const char *result) {
     strcpy_P(temp, result);
     printResult(temp);

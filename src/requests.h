@@ -33,7 +33,8 @@ enum parsers {
     P_EGR_TEMP,
     P_ISC,
     P_HEX,
-    P_CL_FLAGS
+    P_CL_FLAGS,
+    P_STATE1
 };
 
 struct request {
@@ -64,6 +65,7 @@ enum requests_addr {
     TPS                  = 0x17,  // tpsRaw:     100*x/255 %
     AIR_FLOW_HZ          = 0x1A,  // mafRaw:     6.25 Hz/LSB
     ACC_ENRICH           = 0x1D,  // accEnr:     100*x/255 %  (max $48)
+    ENGINE_STATE1        = 0x1E,  // state1:     engine-run + closed-loop bitfield
     ENGINE_SPEED         = 0x21,  // rpm31:      31.25 rpm/LSB
     KNOCK_SUM            = 0x26,  // knockSum:   0..255 count
     INJECTOR_PULSE_HI    = 0x29,  // injPw high byte  (paired with $2A for 16-bit us)
