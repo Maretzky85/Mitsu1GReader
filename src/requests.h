@@ -32,7 +32,8 @@ enum parsers {
     P_BARO,
     P_EGR_TEMP,
     P_ISC,
-    P_HEX
+    P_HEX,
+    P_CL_FLAGS
 };
 
 struct request {

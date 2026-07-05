@@ -103,7 +103,7 @@ request requests[] = {
         // Direct RAM peek entries (obdCode >= $40) -- see requests.h.
         {OCTANE,               P_RAW,            OCTANE_NAME,                 EMPTY_NAME},
         {KNOCK_DECAY_TIMER,    P_RAW,            KNOCK_DECAY_NAME,            EMPTY_NAME},
-        {CLOSED_LOOP_FLAGS,    P_HEX,            CLOSED_LOOP_NAME,            HEX_NAME}};
+        {CLOSED_LOOP_FLAGS,    P_CL_FLAGS,       CLOSED_LOOP_NAME,            EMPTY_NAME}};
 
 const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
@@ -186,6 +186,21 @@ void parseInjPulse16(int rawValue, char *unit) {
     }
 }
 
+// Decode closedLpFlags ($E8) bits into a 7-char status string.
+// Bit 7 rich/lean, bit 6 o2 sensor bad, bit 1 closed-loop conditions met,
+// bit 0 airflow above closed-loop threshold. Priority order applies to
+// the 4-char suffix -- most-important state wins.
+void parseClFlags(int rawValue, char *unit) {
+    (void) unit;
+    const char *rl = (rawValue & 0x80) ? "Ri" : "Le";
+    const char *suffix;
+    if (rawValue & 0x40)      suffix = "o2!!";  // sensor flagged bad
+    else if (rawValue & 0x01) suffix = "airH";  // open loop by airflow
+    else if (rawValue & 0x02) suffix = "CLok";  // closed loop OK
+    else                      suffix = "open";  // open loop, no fault
+    sprintf(buffer, "%s %s", rl, suffix);
+}
+
 void parseBaro(int rawValue, char *unit) {
     double result = 0.486 * rawValue;
     char tmpInt1 = result; // NOLINT(cppcoreguidelines-narrowing-conversions)
@@ -243,6 +258,9 @@ char *parseData(int &data, request *requestData) {
             break;
         case P_HEX:
             sprintf(buffer, "  0x%02X%-3s", data & 0xFF, unit);
+            break;
+        case P_CL_FLAGS:
+            parseClFlags(data, unit);
             break;
         default:
             sprintf(buffer, "%11s%3d", "", data);
