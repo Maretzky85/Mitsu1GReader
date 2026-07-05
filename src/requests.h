@@ -31,7 +31,8 @@ enum parsers {
     P_AIR_TEMP,
     P_BARO,
     P_EGR_TEMP,
-    P_ISC
+    P_ISC,
+    P_HEX
 };
 
 struct request {
@@ -41,8 +42,10 @@ struct request {
     const char *unit PROGMEM;
 };
 
-// obdCodes -- verified against MH6111 obdTable at ROM $D000
+// obdCodes -- verified against MH6111 obdTable at ROM $D000.
+// Codes $40..$F0 (except $CA) are direct RAM peek: response = RAM[code].
 enum requests_addr {
+    // Table lookups ($00..$3D) -- indexed through obdTable
     SWITCHES             = 0x02,  // port3 flags
     TIMING_ADVANCE       = 0x06,  // timingAdv:  (raw - 10) deg BTDC
     COOLANT_TEMP_RAW     = 0x07,  // ectRaw:     ADC, thermistor lookup
@@ -66,6 +69,11 @@ enum requests_addr {
     INJECTOR_PULSE_LO    = 0x2A,  // injPw low  byte
     AIR_VOLUME           = 0x2C,  // airCnt0 high byte
     AIR_TEMP_RAW         = 0x3A,  // iatRaw:     ADC, thermistor lookup (unfiltered)
+
+    // Direct RAM peek ($40..$F0) -- returns RAM[code]. No obdTable indirection.
+    OCTANE               = 0x52,  // octane:     ignition-timing learning value, decrements on knock, increments when clean
+    KNOCK_DECAY_TIMER    = 0x8C,  // T200s_knock: knock attenuation timer (non-zero = ECU pulling timing right now)
+    CLOSED_LOOP_FLAGS    = 0xE8,  // closedLpFlags: bit 7 = rich/lean, other bits = loop state
 };
 
 extern request requests[];

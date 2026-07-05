@@ -20,6 +20,9 @@ const char ISC_STEPS_NAME[] PROGMEM = "ISC steps";
 const char KNOCK_SUM_NAME[] PROGMEM = "Knock Sum";
 const char IGNITION_ADVANCE_NAME[] PROGMEM = "Ign Advance";
 const char EGR_TEMPERATURE_NAME[] PROGMEM = "Egr Temp";
+const char OCTANE_NAME[] PROGMEM = "Octane";
+const char KNOCK_DECAY_NAME[] PROGMEM = "Knock Dcy";
+const char CLOSED_LOOP_NAME[] PROGMEM = "CL Flags";
 
 // UNITS
 const char VOLTS_NAME[] PROGMEM = "V";
@@ -31,6 +34,7 @@ const char HERTZ_NAME[] PROGMEM = "Hz";
 const char EMPTY_NAME[] PROGMEM = " ";
 const char KPA_NAME[] PROGMEM = "kPa";
 const char DEGREES_NAME[] PROGMEM = "C";
+const char HEX_NAME[] PROGMEM = "h";
 
 // MH6111 ECT/IAT thermistor lookup tables.
 // Copied from ROM disassembly (Mitsubishi MMCD service curve), lines 378-444 of
@@ -94,7 +98,12 @@ request requests[] = {
         {ISC_STEPS,            P_ISC,            ISC_STEPS_NAME,              PERCENT_NAME},
         {KNOCK_SUM,            P_RAW,            KNOCK_SUM_NAME,              EMPTY_NAME},
         {TIMING_ADVANCE,       P_TIMING_ADVANCE, IGNITION_ADVANCE_NAME,       DEGREES_NAME},
-        {EGR_TEMP,             P_EGR_TEMP,       EGR_TEMPERATURE_NAME,        CELSIUS_NAME}};
+        {EGR_TEMP,             P_EGR_TEMP,       EGR_TEMPERATURE_NAME,        CELSIUS_NAME},
+
+        // Direct RAM peek entries (obdCode >= $40) -- see requests.h.
+        {OCTANE,               P_RAW,            OCTANE_NAME,                 EMPTY_NAME},
+        {KNOCK_DECAY_TIMER,    P_RAW,            KNOCK_DECAY_NAME,            EMPTY_NAME},
+        {CLOSED_LOOP_FLAGS,    P_HEX,            CLOSED_LOOP_NAME,            HEX_NAME}};
 
 const int MAX_REQUESTS = sizeof(requests) / sizeof(*requests);
 
@@ -231,6 +240,9 @@ char *parseData(int &data, request *requestData) {
             break;
         case P_ISC:
             parseISC(data, unit);
+            break;
+        case P_HEX:
+            sprintf(buffer, "  0x%02X%-3s", data & 0xFF, unit);
             break;
         default:
             sprintf(buffer, "%11s%3d", "", data);
